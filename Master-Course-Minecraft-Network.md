@@ -1,46 +1,46 @@
-# 🎓 MASTER COURSE SUPREMO: NETWORK GAMING INFRASTRUCTURE & DEVOPS
-## *Percorso Formativo d'Elite: Dalle Fondamenta Hardware alla Leadership di Network Scalabili*
+# 🎓 MASTER COURSE: MINECRAFT NETWORK ENGINEERING & DEVOPS
+## *Percorso di Ingegneria Avanzata: Dai Fondamenti Hardware alla Gestione di Network Scalabili*
 
 ---
 
-### **📌 INTRODUZIONE AL CORSO MASTER**
+### **📌 INTRODUZIONE AL CORSO**
 Benvenuto, futuro Ingegnere.
 
-Questo programma di formazione è unico nel suo genere. È un **ponte** che collega due mondi spesso separati:
-1.  **I Fondamenti Scolastici (Medie/Superiori):** Matematica, Logica, Elettrotecnica.
-2.  **Il Mondo Professionale (Università/Lavoro):** DevOps, Cloud Engineering, Cybersecurity.
+Questo programma di formazione è progettato per colmare il divario tra due mondi fondamentali:
+1.  **I Fondamenti Accademici:** Matematica, Logica, Elettrotecnica (il rigore scientifico).
+2.  **L'Ingegneria Applicata:** DevOps, Cloud Computing, Cybersecurity (le competenze di mercato).
 
-**A chi è rivolto questo corso?**
-- **Sei uno studente delle medie/superiori?** Qui capirai *finalmente* a cosa servono le equazioni, il sistema binario e la fisica che studi a scuola. Vedrai come l'algebra si trasforma in plugin per Minecraft.
-- **Sei un aspirante SysAdmin o Developer?** Troverai le competenze avanzate (Linux, Docker, Java) richieste dalle aziende tech moderne, spiegate partendo da zero.
-- **Sei un Owner di server?** Imparerai a gestire il tuo network non come un gioco, ma come un'azienda tecnologica scalabile.
+**Destinatari del Corso:**
+- **Studenti:** Per comprendere l'applicazione pratica di concetti teorici come l'algebra booleana e la fisica nei sistemi reali.
+- **SysAdmin & Developer:** Per acquisire competenze enterprise (Linux, Docker, Java) partendo dalle basi.
+- **Server Owner:** Per gestire infrastrutture complesse con una mentalità imprenditoriale e tecnica.
 
-Questa non è una semplice guida, ma un **Framework di Competenze** progettato per trasformare un appassionato in un **Chief Technical Officer (CTO)**. 
+Questo documento funge da **Syllabus Tecnico** e **Framework di Competenze**, strutturato per guidare il lettore da appassionato a **Chief Technical Officer (CTO)**.
 
-Il segreto di un network di successo non risiede solo nei plugin, ma nella profonda comprensione di come il software interagisce con l'hardware.
+Il successo di un'infrastruttura non risiede nella semplice configurazione software, ma nella profonda comprensione dell'interazione hardware-software.
 
-> **FILOSOFIA DEL CORSO**: "Non puoi ottimizzare ciò che non comprendi profondamente."
+> **FILOSOFIA DEL CORSO**: "L'ottimizzazione efficace nasce dalla comprensione profonda."
 
-**Obiettivi del Master:**
-0.  **Fondamenti Assoluti:** Capire il "perché" delle cose (adatto a tutti).
-1.  **Padronanza Hardware:** Capire il "ferro" per ottimizzare ogni centesimo.
-2.  **SysAdmin Mastery:** Dominare Linux come un ambiente nativo.
-3.  **Cyber-Resilience:** Costruire fortezze digitali.
-4.  **DevOps & Java:** Sviluppare codice professionale.
-5.  **Leadership & Ethics:** Gestire team e finanze.
+**Obiettivi Formativi:**
+0.  **Fondamenti Teorici:** Acquisizione dei principi primi (Elettrotecnica, Logica).
+1.  **Hardware Mastery:** Comprensione architetturale per l'ottimizzazione delle risorse.
+2.  **Linux Administration:** Gestione avanzata di sistemi operativi server.
+3.  **Security Engineering:** Implementazione di protocolli di sicurezza difensiva.
+4.  **Software Development:** Sviluppo di codice manutenibile e scalabile (Java/Python).
+5.  **IT Management:** Gestione economica ed etica delle risorse tecnologiche.
 
 ---
 
-## 📘 INDICE SCHEMATICO (L'ENCICLOPEDIA TOTALE)
+## 📘 SYLLABUS TECNICO (INDICE DEI MODULI)
 
 ### **⚫ PARTE 0: FONDAMENTI (ELETTROTECNICA E INFORMATICA)**
-0.1. [Modulo 0.1: Elettricità e Legge di Ohm (Il Sangue del Computer)](#modulo-0-1)
-0.2. [Modulo 0.2: Dal Transistor al Bit (L'Interruttore Magico)](#modulo-0-2)
-0.3. [Modulo 0.3: Sistema Binario (Il Linguaggio dei Computer)](#modulo-0-3)
-0.4. [Modulo 0.4: Algebra e Variabili (Le Scatole dei Dati)](#modulo-0-4)
-0.5. [Modulo 0.5: Il Piano Cartesiano e le Coordinate (Mappe e GPS)](#modulo-0-5)
-0.6. [Modulo 0.6: Percentuali e Probabilità (Drop Rate e RNG)](#modulo-0-6)
-0.7. [Modulo 0.7: Logica Booleana (Interruttori e Permessi)](#modulo-0-7)
+0.1. [Modulo 0.1: Elettricità e Legge di Ohm (Fondamenti dell'Alimentazione)](#modulo-0-1)
+0.2. [Modulo 0.2: Dal Transistor al Bit (Fondamenti di Elettronica Digitale)](#modulo-0-2)
+0.3. [Modulo 0.3: Sistema Binario (Rappresentazione dei Dati)](#modulo-0-3)
+0.4. [Modulo 0.4: Algebra e Variabili (Astrazione dei Dati)](#modulo-0-4)
+0.5. [Modulo 0.5: Il Piano Cartesiano e le Coordinate (Sistemi di Riferimento Spaziale)](#modulo-0-5)
+0.6. [Modulo 0.6: Percentuali e Probabilità (Calcolo Stocastico Applicato)](#modulo-0-6)
+0.7. [Modulo 0.7: Logica Booleana (Algebra delle Proposizioni)](#modulo-0-7)
 
 ### **🟢 PARTE 1: HARDWARE E FONDAMENTA FISICHE**
 1.  [Modulo I: Anatomia della CPU: Architettura x86, Pipeline e Cache](#modulo-i)
@@ -186,7 +186,7 @@ Il segreto di un network di successo non risiede solo nei plugin, ma nella profo
 Prima di costruire un grattacielo (il tuo Network), devi sapere come funziona il cemento (Elettricità) e come si contano i mattoni (Binario). Se ignori queste basi, quando il server lagga non saprai se è colpa del codice o della corrente.
 
 <a name="modulo-0-1"></a>
-### **MODULO 0.1: ELETTRICITÀ E LEGGE DI OHM (IL SANGUE DEL COMPUTER)**
+### **MODULO 0.1: ELETTRICITÀ E LEGGE DI OHM (FONDAMENTI DELL'ALIMENTAZIONE)**
 
 *Esempio Pratico:*
 Immagina un tubo d'acqua.
@@ -255,7 +255,7 @@ Senza conoscere la Legge di Ohm e la relazione tra Watt e VA, avresti comprato u
 
 ---
 <a name="modulo-0-2"></a>
-### **MODULO 0.2: DAL TRANSISTOR AL BIT (L'INTERRUTTORE MAGICO)**
+### **MODULO 0.2: DAL TRANSISTOR AL BIT (FONDAMENTI DI ELETTRONICA DIGITALE)**
 
 *Esempio Pratico:*
 Un computer non è intelligente. È solo una stanza con miliardi di interruttori della luce.
@@ -305,7 +305,7 @@ Installare **Java 64-bit**.
 
 
 <a name="modulo-0-3"></a>
-### **MODULO 0.3: SISTEMA BINARIO (IL LINGUAGGIO DEI COMPUTER)**
+### **MODULO 0.3: SISTEMA BINARIO (RAPPRESENTAZIONE DEI DATI)**
 
 *Esempio Pratico:*
 Noi umani contiamo fino a 10 perché abbiamo 10 dita.
@@ -363,7 +363,7 @@ Se vedi un errore "Permission Denied" e il codice è 5 (101), sai subito che man
 
 
 <a name="modulo-0-4"></a>
-### **MODULO 0.4: ALGEBRA E VARIABILI (LE SCATOLE DEI DATI)**
+### **MODULO 0.4: ALGEBRA E VARIABILI (ASTRAZIONE DEI DATI)**
 
 *Esempio Pratico:*
 Alle medie usavi la `x` in `x + 5 = 10`.
@@ -436,7 +436,7 @@ Un CTO sa sempre quale "scatola" usare per evitare disastri finanziari virtuali.
 
 
 <a name="modulo-0-5"></a>
-### **MODULO 0.5: IL PIANO CARTESIANO E LE COORDINATE (MAPPE E GPS)**
+### **MODULO 0.5: IL PIANO CARTESIANO E LE COORDINATE (SISTEMI DI RIFERIMENTO SPAZIALE)**
 
 *Esempio Pratico:*
 Per trovare un tesoro, ti serve una mappa con una griglia.
@@ -489,7 +489,7 @@ Ogni volta che un player entra in un nuovo chunk non generato, la CPU deve calco
 
 
 <a name="modulo-0-6"></a>
-### **MODULO 0.6: PERCENTUALI E PROBABILITÀ (DROP RATE E RNG)**
+### **MODULO 0.6: PERCENTUALI E PROBABILITÀ (CALCOLO STOCASTICO APPLICATO)**
 
 *Esempio Pratico:*
 Tirare un dado da 100 facce.
@@ -540,7 +540,7 @@ In un sistema puramente casuale, è possibile (anche se raro) aprire 1000 casse 
 
 
 <a name="modulo-0-7"></a>
-### **MODULO 0.7: LOGICA BOOLEANA (INTERRUTTORI E PERMESSI)**
+### **MODULO 0.7: LOGICA BOOLEANA (ALGEBRA DELLE PROPOSIZIONI)**
 
 *Esempio Pratico:*
 Pensa a un interruttore della luce.
@@ -652,13 +652,13 @@ Risultato: Latenza di accesso alla RAM eliminata = 0 Lag.
 **Budget:** 100€.
 **Opzioni:**
 A) Dual Xeon E5-2699 v4 (44 Core, 2.2 GHz) - *Vecchia Gloria Enterprise*
-B) Ryzen 9 7950X (16 Core, 5.7 GHz) - *Mostro Moderno*
+B) Ryzen 9 7950X (16 Core, 5.7 GHz) - *Market Leader*
 
 **Decisione del CTO:**
 Scegli **B (Ryzen 9)** senza esitazione.
 - Minecraft usa **1 solo Thread** per il 90% della logica di gioco (Entities, Physics, AI).
-- I 44 Core dello Xeon starebbero al 2% di utilizzo mentre il Core #1 sta al 100%, causando lag mostruoso (10 TPS).
-- Il Ryzen ha un IPC mostruoso e 5.7 GHz: gestirà 200 player a 20 TPS stabili.
+- I 44 Core dello Xeon starebbero al 2% di utilizzo mentre il Core #1 sta al 100%, causando latenza elevata (10 TPS).
+- Il Ryzen ha un IPC eccellente e 5.7 GHz: gestirà 200 player a 20 TPS stabili.
 - Gli altri core del Ryzen li userai per il Database, il Proxy (Velocity) e i worker asincroni di Paper.
 
 <a name="modulo-ii"></a>
@@ -722,7 +722,7 @@ Lascia sempre il 10-15% di RAM libera per il Sistema Operativo.
 *Esempio Pratico:*
 Caricare un mondo Minecraft da un vecchio Hard Disk è come cercare di riempire una piscina con un contagocce. Usare un NVMe Enterprise è come usare una pompa idraulica industriale. Se il disco è lento, i player vedranno il mondo caricarsi "a pezzi" (chunk lag) anche se la CPU è veloce.
 
-- **NVMe PCIe Gen 4/5 (Velocità Iperspaziale)**: Questi dischi leggono a oltre 7000MB/s. Sono vitali per caricare i chunk istantaneamente e gestire migliaia di query al database senza code d'attesa (I/O Wait).
+- **NVMe PCIe Gen 4/5 (Velocità Estrema)**: Questi dischi leggono a oltre 7000MB/s. Sono vitali per caricare i chunk istantaneamente e gestire migliaia di query al database senza code d'attesa (I/O Wait).
 - **Configurazioni RAID (La Ruota di Scorta)**:
   - **RAID 1 (Mirroring)**: Due dischi gemelli. Se uno esplode, l'altro continua a lavorare. Sicurezza massima per i dati.
   - **RAID 0 (Striping)**: Velocità doppia, ma se un disco si rompe perdi TUTTO. Mai usarlo per dati importanti.
@@ -799,7 +799,7 @@ Il componente più critico per la stabilità 24/7. Converte 12V in 1.3V per la C
 - **MOSFETs:** I transistor che fanno il lavoro sporco. Devono essere dissipati bene, altrimenti vanno in protezione termica.
 
 **IPMI (Intelligent Platform Management Interface):**
-La "Magia Nera" dei server veri. Un piccolo computer dentro la scheda madre che ti permette di:
+La funzionalità di gestione remota avanzata (Out-of-Band Management). Un sottosistema indipendente sulla scheda madre che ti permette di:
 - Accendere/Riavviare il server da remoto anche se è spento o crashato.
 - Vedere lo schermo del BIOS via browser (KVM over IP).
 - Monitorare temperature e ventole indipendentemente dal sistema operativo.
@@ -900,7 +900,7 @@ Per la CPU, sommare `10 + 10` è lento. Fare `10 << 1` è istantaneo.
 I motori di gioco (come quello di Minecraft) usano questo trucco per calcolare le coordinate dei Chunk (che sono 16x16, ovvero 2^4) in nanosecondi. `BlockX >> 4` ti dà la coordinata del ChunkX.
 
 **XOR Swap Algorithm:**
-Puoi scambiare due variabili senza usarne una terza temporanea usando XOR (`^`). Magia pura dell'assembly.
+Puoi scambiare due variabili senza usarne una terza temporanea usando XOR (`^`). Ottimizzazione a basso livello.
 
 #### 🌍 [REAL-WORLD APPLICATION]
 **Scenario:** Packet Compression nel Protocollo Minecraft.
@@ -1026,7 +1026,7 @@ Hai una lista di 1.000 player. Se per trovare un player devi scorrere tutta la l
   - **O(1) - Il Lampo**: Tempo costante. Es: Trovare un player tramite il suo nome in una HashMap.
   - **O(log n) - La Ricerca Efficace**: Es: Trovare un valore in un database indicizzato.
   - **O(n) - La Scansione**: Es: Cercare un player controllando ogni singola riga di un file di testo. Lento.
-  - **O(n²) - Il Suicidio Tecnico**: Es: Controllare ogni player contro ogni altro player in un ciclo annidato. Con 100 player fai 10.000 operazioni. Con 1.000 player ne fai 1.000.000. È il modo più veloce per far crashare un server.
+  - **O(n²) - Inefficienza Critica**: Es: Controllare ogni player contro ogni altro player in un ciclo annidato. Con 100 player fai 10.000 operazioni. Con 1.000 player ne fai 1.000.000. È il modo più veloce per far crashare un server.
 - **Space Complexity (Consumo di RAM)**: Un algoritmo può essere velocissimo ma consumare 10GB di RAM. Un Master Admin sceglie sempre il bilanciamento perfetto.
 
 #### 📚 [DIZIONARIO TECNICO]
@@ -1160,7 +1160,7 @@ Le auto non possono passare col rosso. Devono chiedere al Vigile "Posso passare?
 Se il Vigile è lento (Kernel non ottimizzato), si crea la coda (Lag), anche se le auto sono Ferrari.
 
 - **Ring 0**:
-  - *Zero-Based:* L'ufficio del Capo Supremo. Solo il Kernel può entrare qui. Se un plugin entrasse qui, potrebbe cancellare tutto il mondo.
+  - *Zero-Based:* L'area riservata al Kernel (Privileged Mode). Solo il codice di sistema può operare qui. Se un plugin accedesse a questo livello, comprometterebbe l'intero sistema.
 - **Context Switching**:
   - *Zero-Based:* Il tempo che il Vigile perde per girarsi da un incrocio all'altro. Meno si gira, più traffico smaltisce.
 
@@ -1222,13 +1222,13 @@ Linux è una casa ordinata. Non butti le mutande nel frigo.
 **Ext4 vs XFS vs ZFS.**
 - **Ext4:** Lo standard. Solido, affidabile, ottimo per tutto.
 - **XFS:** Eccellente per file enormi e parallelismo. Usato spesso nei server Enterprise (RHEL).
-- **ZFS:** Il Re. Include gestione volume, RAID, compressione e snapshot.
-  - *Copy-on-Write (CoW):* Quando modifichi un file, ZFS non lo sovrascrive. Scrive la modifica in uno spazio nuovo e poi sposta il puntatore. Risultato: **Mai più file corrotti** per crash di corrente.
+- **ZFS:** Lo standard avanzato. Include gestione volume, RAID, compressione e snapshot.
+  - *Copy-on-Write (CoW):* Quando modifichi un file, ZFS non lo sovrascrive. Scrive la modifica in uno spazio nuovo e poi sposta il puntatore. Risultato: **Integrità dei dati garantita** anche in caso di crash di corrente.
 
-**L'incubo degli Inode esauriti.**
+**Il Problema degli Inode esauriti.**
 Hai un disco da 1TB vuoto al 90%, ma non puoi creare file. Errore: "No space left on device".
 **Causa:** Hai milioni di file minuscoli (es. cache di plugin, log vecchi, sessioni PHP) che hanno consumato tutti gli Inode disponibili.
-**Comando:** `df -i` ti svela la verità.
+**Comando:** `df -i` mostra l'utilizzo degli inode.
 
 #### 🌍 [REAL-WORLD APPLICATION]
 **Scenario:** Separare `/var` e `/home`.
@@ -1249,9 +1249,9 @@ Non dai le chiavi della cassaforte al giardiniere.
 L'utente `minecraft` è il giardiniere: può toccare solo il giardino (Server), non la casa (Sistema Operativo).
 
 - **Root**:
-  - *Zero-Based:* Dio. Può fare tutto, anche distruggere l'universo con un comando. Non usarlo mai per giocare.
+  - *Zero-Based:* L'Amministratore di Sistema (Superuser). Ha privilegi assoluti e può modificare ogni file. Non usarlo mai per operazioni ordinarie.
 - **Sudo**:
-  - *Zero-Based:* Un pass temporaneo per diventare Dio per 5 minuti.
+  - *Zero-Based:* Un meccanismo per ottenere privilegi amministrativi temporanei.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **UID (User ID):** Il numero identificativo di un utente. Root è sempre 0.
@@ -1260,7 +1260,7 @@ L'utente `minecraft` è il giardiniere: può toccare solo il giardino (Server), 
 >
 > **Principle of Least Privilege (PoLP):** La regola d'oro della sicurezza: dai a un utente *solo* i permessi minimi necessari per fare il suo lavoro, e niente di più.
 >
-> **`/etc/sudoers`:** Il file sacro dove si decide chi può usare `sudo`.
+> **`/etc/sudoers`:** Il file di configurazione critico dove si decide chi può usare `sudo`.
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **Identity Management in Linux.**
@@ -1277,7 +1277,7 @@ Linux non conosce i nomi ("Mario"), conosce solo i numeri (UID 1000).
 **Scenario:** Hackeraggio del server Minecraft.
 **Setup Sbagliato:** Hai lanciato il server come **Root**.
 - L'hacker trova un bug nel plugin "SuperChat", esce dal server Minecraft e si ritrova nella shell di Linux con permessi **Root**.
-- **Risultato:** Formatta il disco, installa un miner di Bitcoin, ruba le chiavi SSH. Game Over.
+- **Risultato:** Formatta il disco, installa un miner di Bitcoin, ruba le chiavi SSH. Compromissione totale.
 
 **Setup Corretto:** Hai creato l'utente `minecraft` (senza sudo).
 - L'hacker esce nella shell.
@@ -1328,7 +1328,7 @@ Quando `rwx` non basta. Esempio: "Voglio che Mario legga, Luigi scriva e Peach n
 #### 🌍 [REAL-WORLD APPLICATION]
 **Scenario:** Proteggere i backup.
 Hai uno script che fa il backup del database e lo salva in `/backup/db.sql`.
-Se i permessi sono `777` (Male assoluto):
+Se i permessi sono `777` (Estremamente insicuro):
 - Un player curioso entra nel server, scarica il file `db.sql`.
 - Dentro ci sono le password hashate di tutti gli utenti.
 - Le cracka offline e ruba gli account degli Admin.
@@ -1337,7 +1337,7 @@ Se i permessi sono `777` (Male assoluto):
 - **6 (RW):** Solo l'utente `minecraft` può leggere e scrivere.
 - **0:** Il gruppo non vede nulla.
 - **0:** Gli altri non vedono nulla.
-Risultato: Backup blindato.
+Risultato: Backup protetto.
 
 ---
 
@@ -1361,7 +1361,7 @@ Con Bash costruisci un robot: "Prendi il file -> Cerca 'Error' -> Salva su un fo
 > - **Stdout (1):** Output (Schermo).
 > - **Stderr (2):** Errori.
 >
-> **Grep:** Global Regular Expression Print. Il comando di ricerca supremo.
+> **Grep:** Global Regular Expression Print. Il comando di ricerca standard.
 >
 > **Awk:** Un linguaggio di programmazione per manipolare colonne di testo.
 
@@ -1377,7 +1377,7 @@ Comando complesso: `cat server.log | grep "Exception" | cut -d ':' -f 2 | sort |
 Risultato: Un report statistico dei crash in 1 secondo.
 
 **Regex (Regular Expressions):**
-`^([0-9]{1,3}\.){3}[0-9]{1,3}$` -> Questa stringa magica matcha *qualsiasi* indirizzo IP. Imparare le Regex ti rende un Dio dei log.
+`^([0-9]{1,3}\.){3}[0-9]{1,3}$` -> Questa stringa matcha *qualsiasi* indirizzo IP. Imparare le Regex è fondamentale per l'analisi avanzata dei log.
 
 #### 🌍 [REAL-WORLD APPLICATION]
 **Scenario:** Attacco Bot.
@@ -1395,11 +1395,11 @@ Comando rapido: `netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c 
 
 *Esempio Pratico:*
 Un falegname senza martello non può costruire nulla.
-Linux ha migliaia di attrezzi. Se ne conosci solo 3 (`cd`, `ls`, `nano`), sei come un chirurgo che opera con un cucchiaio.
-Il Toolbox è la tua cintura di Batman: c'è un gadget per ogni situazione.
+Linux ha migliaia di attrezzi. Se ne conosci solo 3 (`cd`, `ls`, `nano`), sei limitato.
+Il Toolbox è la tua cassetta degli attrezzi professionale: c'è uno strumento per ogni situazione.
 
 - **Curl & Wget**:
-  - *Zero-Based:* I fattorini digitali. "Vai su internet, prendi quel file e portamelo qui subito".
+  - *Zero-Based:* I downloader da riga di comando. "Vai su internet, scarica quel file e salvalo qui".
 - **Find & Locate**:
   - *Zero-Based:* I segugi. "Trova dov'è finito quel file di configurazione che ho perso 3 mesi fa".
 - **Tar & Gzip**:
@@ -1461,12 +1461,12 @@ Il vigile deve chiamare il carro attrezzi (`kill`) per rimuoverla con la forza.
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **I Segnali (Signals): Il linguaggio dei gesti.**
 Non esiste solo `kill -9`.
-- **SIGTERM (15):** "Per favore, chiuditi". Il processo salva i dati, chiude i file e esce pulito. È il modo gentile.
-- **SIGKILL (9):** "Muori ora". Il Kernel stacca la spina. Il processo non può salvare nulla. Dati corrotti garantiti.
+- **SIGTERM (15):** "Termina gentilmente". Il processo salva i dati, chiude i file e esce pulito.
+- **SIGKILL (9):** "Termina forzatamente". Il Kernel interrompe immediatamente l'esecuzione. Il processo non può salvare nulla. Dati persi garantiti.
 - **SIGHUP (1):** "Rileggi la configurazione". Utile per aggiornare Nginx senza riavviarlo.
 
 **Priority & Niceness.**
-I valori vanno da -20 (Massima priorità, Dio) a +19 (Minima priorità, Schiavo).
+I valori vanno da -20 (Massima priorità, Real-Time) a +19 (Minima priorità, Background).
 Minecraft di solito gira a 0 o -5. Mai metterlo a -20 o bloccherà il Kernel.
 
 #### 🌍 [REAL-WORLD APPLICATION]
@@ -1487,12 +1487,12 @@ I player sono connessi ma non possono muoversi. La console non risponde.
 
 *Esempio Pratico:*
 Guidare senza cruscotto. Non sai se hai benzina o se il motore fonde.
-Netdata è un cruscotto da astronave. Vedi tutto.
+Netdata è un cruscotto di monitoraggio completo. Vedi tutto.
 
 - **Load Average**:
-  - *Zero-Based:* Quanta gente è in coda alla cassa. Se il numero è alto, il server è intasato.
+  - *Zero-Based:* Il carico di lavoro del sistema. Se il numero è alto, il server è sovraccarico.
 - **Htop**:
-  - *Zero-Based:* I raggi X per vedere quali programmi stanno mangiando la tua CPU.
+  - *Zero-Based:* Monitoraggio in tempo reale dei processi che consumano la CPU.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **Load Average:** Il numero medio di processi che aspettano la CPU (o il disco). Se è superiore al numero di Core, sei nei guai.
@@ -1501,10 +1501,10 @@ Netdata è un cruscotto da astronave. Vedi tutto.
 >
 > **Swap Usage:** Se è > 0, hai poca RAM.
 >
-> **Steal Time:** Se sei su una VPS, è il tempo che il "padrone di casa" (Host) ti sta rubando per darlo a un altro inquilino.
+> **Steal Time:** Se sei su una VPS, è il tempo che l'Host ti sta sottraendo per darlo a un altro inquilino.
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Analisi dei Bottli.**
+**Analisi dei Colli di Bottiglia (Bottlenecks).**
 - **CPU Bound:** La CPU è al 100%. (Es. Generazione chunk, TNT explosion). Soluzione: CPU più veloce.
 - **I/O Bound:** La CPU è al 10% ma il Load Average è 50. (Es. Backup, salvataggio mondo). Soluzione: NVMe più veloce.
 - **Network Bound:** La CPU dorme, il disco dorme, ma i player laggano. Soluzione: Più banda o migliore routing.
@@ -1539,7 +1539,7 @@ Regola 3-2-1: 3 Copie, 2 Posti diversi, 1 Fuori casa (Cloud).
 - **Rsync**:
   - *Zero-Based:* Copia intelligente. Se hai cambiato una virgola in un libro, non ricopia tutto il libro, ma solo la virgola.
 - **ZFS Snapshots**:
-  - *Zero-Based:* La macchina del tempo. Premi un bottone e torni a 5 minuti fa.
+  - *Zero-Based:* Fotografia istantanea del filesystem. Permette il ripristino immediato a uno stato precedente.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **RTO (Recovery Time Objective):** Quanto tempo puoi permetterti di stare offline prima di fallire (Es. 1 ora).
@@ -1605,13 +1605,13 @@ Aggiungi il repo ufficiale (es. Eclipse Adoptium):
 ### **22. MODULO XXII: SYSTEMD: LIFECYCLE MANAGEMENT DEI SERVIZI MINECRAFT**
 
 *Esempio Pratico:*
-Il maggiordomo che sveglia tutti la mattina. Se il cuoco (MySQL) sviene, lui lo rianima subito.
-Se il server Minecraft crasha alle 3 di notte, Systemd lo riavvia mentre tu dormi.
+Il supervisore che gestisce i servizi. Se il database (MySQL) si arresta inaspettatamente, Systemd lo riavvia automaticamente.
+Se il server Minecraft crasha alle 3 di notte, Systemd lo riavvia riducendo il downtime.
 
 - **Unit File**:
-  - *Zero-Based:* Il contratto di lavoro. Dice al maggiordomo cosa fare, quando farlo e cosa fare se qualcosa va storto.
+  - *Zero-Based:* Il file di configurazione che definisce come avviare e gestire il servizio.
 - **Journalctl**:
-  - *Zero-Based:* Il diario del maggiordomo. "Ore 03:00: Il cuoco è svenuto. L'ho rianimato".
+  - *Zero-Based:* Il sistema di logging centralizzato. Registra l'output e gli errori dei servizi.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **Daemon:** Un processo che gira in background senza interfaccia grafica, aspettando di fare il suo lavoro (es. sshd, mysqld).
@@ -2347,7 +2347,7 @@ Java è costruire un grattacielo: servono ingegneri, permessi, cemento armato (T
 Python è usare il nastro adesivo americano: ripari tutto in 5 minuti, funziona, ma non ci costruisci un palazzo.
 
 - **Scripting**:
-  - *Zero-Based:* Il maggiordomo robot. Invece di controllare i log a mano ogni mattina, scrivi 3 righe di Python e lui lo fa per te mentre dormi.
+  - *Zero-Based:* L'assistente automatizzato. Invece di controllare i log a mano ogni mattina, scrivi 3 righe di Python e lui lo fa per te mentre dormi.
 - **Librerie (Coltellino Svizzero)**:
   - *Zero-Based:* Invece di inventare la ruota, usi pezzi già fatti. Vuoi leggere Excel? C'è `pandas`. Vuoi un bot Discord? C'è `discord.py`.
 
@@ -3271,7 +3271,7 @@ Con Paper, puoi dire "Carica il mondo in background e avvisami quando è pronto"
   - *Tecnica:* `paperLib.getChunkAtAsync(loc)`. Il server continua a girare a 20 TPS mentre il disco legge i dati.
 
 - **Folia (Il Futuro - Regionized Multithreading)**:
-  - *La Bomba:* Normalmente Minecraft usa 1 sola CPU (Single Thread). Folia divide il mondo in "Regioni".
+  - *Parallelismo Reale:* Normalmente Minecraft usa 1 sola CPU (Single Thread). Folia divide il mondo in "Regioni".
   - *Esempio:* I player allo Spawn usano la CPU 1. I player nel Nether usano la CPU 2.
   - *Risultato:* Un server può reggere 1000 player reali invece di 200. Richiede plugin compatibili.
 
@@ -5010,7 +5010,7 @@ Il marketing non è spammare IP sugli altri server. È fare un TikTok divertente
 
 
 <a name="modulo-cv"></a>
-### **105. Modulo CV: Career Path: Dal Server al Mondo Professionale**
+### **109. Modulo CIX: Career Path: Dal Server al Mondo Professionale**
 
 *Esempio Pratico:*
 Gestire un server non è un gioco. Stai facendo il SysAdmin, il Manager, il Contabile e il Programmatore. Le aziende cercano disperatamente queste skill.
@@ -5043,7 +5043,7 @@ Gestire un server non è un gioco. Stai facendo il SysAdmin, il Manager, il Cont
 
 
 <a name="modulo-cvi"></a>
-### **106. Modulo CVI: Personal Branding e Networking su LinkedIn/GitHub**
+### **110. Modulo CX: Personal Branding e Networking su LinkedIn/GitHub**
 
 *Esempio Pratico:*
 Su LinkedIn non scrivere "Ho un server". Scrivi "Fondatore di una piattaforma di gaming con 500 utenti attivi e gestione team remoto".
@@ -5131,7 +5131,7 @@ Terraform è come avere il file di salvataggio del mondo. Scrivi `server.txt`, l
 ---
 
 <a name="modulo-cix"></a>
-### **109. Modulo CIX: Prometheus & Grafana: Telemetria Avanzata e Alerting**
+### **113. Modulo CXIII: Prometheus & Grafana: Telemetria Avanzata e Alerting**
 
 *Esempio Pratico:*
 Guidare un server senza Grafana è come guidare un'auto con il parabrezza oscurato e senza tachimetro. Vai a sensazione finché non ti schianti.
