@@ -5093,7 +5093,6 @@ Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorn
 ---
 
 **FINE DELLA GUIDA SUPREMA**
-*Ora tocca a te costruire il futuro del tuo Network.*
 
 ---
 
