@@ -5090,11 +5090,6 @@ Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorn
 - **Growth Mindset**:
   - *Zero-Based:* L'errore non è un fallimento, è un dato. "Ho imparato che questo plugin non funziona", non "Sono un idiota".
 
----
-
-**FINE DELLA GUIDA SUPREMA**
-
----
 
 <a name="modulo-cviii"></a>
 ### **108. Modulo CVIII: Terraform: Infrastructure as Code (IaC) e Provisioning**
