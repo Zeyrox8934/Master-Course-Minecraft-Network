@@ -1,0 +1,28 @@
+# Minecraft Server Files to Ignore
+*.jar
+*.log
+logs/
+crash-reports/
+debug/
+world/
+world_nether/
+world_the_end/
+cache/
+libraries/
+versions/
+.gradle/
+build/
+
+# Secrets (IMPORTANT)
+forwarding.secret
+*.secret
+server.properties
+spigot.yml
+bukkit.yml
+paper.yml
+velocity.toml
+waterfall.yml
+
+# OS generated files
+.DS_Store
+Thumbs.db
