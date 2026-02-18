@@ -1019,51 +1019,57 @@ Questo è fondamentale per gli SSD, che usano celle NAND Flash per salvare i dat
 <a name="modulo-ix"></a>
 ### **9. MODULO IX: TEORIA DELLA COMPUTAZIONE: ALGORITMI E BIG O NOTATION**
 
+> **[PREREQUISITO FLASH]**
+> **Big O Notation:** È il metro di giudizio universale per la velocità di un algoritmo. Non misura i secondi, ma *come cresce il tempo di esecuzione* all'aumentare dei dati (es. player).
+
 *Esempio Pratico:*
 Hai una lista di 1.000 player. Se per trovare un player devi scorrere tutta la lista (O(n)), e lo fai per ogni evento (es. ogni volta che qualcuno cammina), il server esploderà. Se invece usi un "Indice" (O(1)), troverai il player istantaneamente, che tu ne abbia 10 o 10.000. Questa è la differenza tra un server che lagga con 20 persone e uno fluido con 500.
 
 - **Big O Notation (Efficienza del Codice)**:
-  - **O(1) - Il Lampo**: Tempo costante. Es: Trovare un player tramite il suo nome in una HashMap.
-  - **O(log n) - La Ricerca Efficace**: Es: Trovare un valore in un database indicizzato.
-  - **O(n) - La Scansione**: Es: Cercare un player controllando ogni singola riga di un file di testo. Lento.
-  - **O(n²) - Inefficienza Critica**: Es: Controllare ogni player contro ogni altro player in un ciclo annidato. Con 100 player fai 10.000 operazioni. Con 1.000 player ne fai 1.000.000. È il modo più veloce per far crashare un server.
-- **Space Complexity (Consumo di RAM)**: Un algoritmo può essere velocissimo ma consumare 10GB di RAM. Un Master Admin sceglie sempre il bilanciamento perfetto.
+  - **O(1) - Il Lampo (Constant Time)**: Il tempo non cambia mai, indipendentemente dai dati. Es: Accedere a un elemento di un Array sapendo l'indice, o usare una `HashMap`.
+  - **O(log n) - La Ricerca Efficace (Logarithmic Time)**: Il tempo cresce molto lentamente. Es: Ricerca binaria in una lista ordinata. Se raddoppi i dati, aggiungi solo un passaggio in più.
+  - **O(n) - La Scansione (Linear Time)**: Il tempo cresce linearmente. Es: `List.contains()` in una `ArrayList`. Deve controllare ogni elemento uno per uno.
+  - **O(n²) - Inefficienza Critica (Quadratic Time)**: Es: Cicli annidati (Nested Loops). Con 100 player fai 10.000 operazioni. Con 1.000 player ne fai 1.000.000. È il modo più veloce per uccidere i TPS.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **Time Complexity:** Quanto tempo impiega un algoritmo a completarsi al crescere dei dati in input (n).
 >
 > **Space Complexity:** Quanta memoria extra serve all'algoritmo per funzionare.
 >
-> **HashMap (Tabella Hash):** Una struttura dati che permette di trovare un valore istantaneamente (O(1)) usando una chiave unica (es. UUID del player).
+> **HashMap (Tabella Hash):** Una struttura dati che permette di trovare un valore istantaneamente (O(1)) calcolando l'hash della chiave.
 >
-> **Nested Loop (Ciclo Annidato):** Un ciclo dentro un altro ciclo. Spesso causa di complessità O(n²).
+> **Nested Loop:** Un ciclo dentro un altro ciclo. Spesso causa di complessità O(n²).
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Analisi di un Plugin "Laggy":**
-Immagina un plugin che controlla se due player sono vicini.
+**Ottimizzazione Pratica di un Plugin:**
+
+**Scenario:** Un plugin "Anti-Team" controlla se due player sono vicini per impedire alleanze illegali.
+
+**Approccio Principiante (O(n²)):**
 ```java
-// CATTIVO CODICE O(n^2)
+// CATTIVO CODICE
 for (Player p1 : allPlayers) {
     for (Player p2 : allPlayers) {
-        if (p1.distance(p2) < 5) { ... }
+        if (p1.getLocation().distance(p2.getLocation()) < 10) { 
+            // Logica punitiva 
+        }
     }
 }
 ```
-Con 100 player: 10.000 controlli per tick (200.000 al secondo).
-Con 500 player: 250.000 controlli per tick (5 MILIONI al secondo). **Server Morto.**
+*Analisi:* Con 100 player, esegue 10.000 calcoli di distanza (che includono radici quadrate, lente!) 20 volte al secondo. Totale: 200.000 operazioni pesanti al secondo. **Server Lag.**
 
-**Soluzione Ottimizzata (Spatial Hashing):**
-Dividi il mondo in celle (Chunk). Controlla solo i player nello stesso Chunk.
-Complessità: O(n) o quasi O(1).
+**Approccio Senior (Spatial Hashing - O(n)):**
+Dividi il mondo in una griglia (Chunk).
+1. Inserisci ogni player in una `HashMap<ChunkID, List<Player>>`. (Costo O(n)).
+2. Per ogni player, controlla solo i player nello *stesso* Chunk e in quelli adiacenti (9 chunk totali).
+*Analisi:* Il numero di controlli è drasticamente ridotto. Il costo è lineare rispetto al numero di player, non quadratico.
 
 #### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Il comando `/baltop` (Classifica soldi) fa laggare il server.
-**Causa:** Il plugin deve leggere i soldi di 50.000 player, ordinarli dal più ricco al più povero (Sorting O(n log n)) e mostrarli.
-**Soluzione:**
-1.  Non calcolarlo in tempo reale.
-2.  Usa un **Task Asincrono** che aggiorna la classifica ogni 5 minuti in background.
-3.  Quando un player digita `/baltop`, mostra la lista cachata (O(1)).
-**Risultato:** Zero lag per il Main Thread.
+**Il Caso della Ban List:**
+Hai 50.000 player bannati.
+- Se usi una `ArrayList<String>` per i nomi: Ogni volta che qualcuno entra, il server deve confrontare il suo nome con 50.000 stringhe. (Lento, O(n)).
+- Se usi un `HashSet<String>`: Il server calcola l'hash del nome e va a colpo sicuro. (Istantaneo, O(1)).
+**Lezione:** La scelta della struttura dati (List vs Set vs Map) è la decisione più importante che prenderai come sviluppatore.
 
 ---
 
@@ -1244,14 +1250,17 @@ Se i log di Minecraft (`/var/log`) impazziscono e riempiono il disco al 100%:
 <a name="modulo-xiv"></a>
 ### **14. MODULO XIV: GESTIONE UTENTI E POLITICHE DI SUDOERS**
 
+> **[PREREQUISITO FLASH]**
+> **Root:** È il "Dio" del sistema Linux. L'utente amministratore supremo. Può fare tutto, incluso cancellare l'intero sistema operativo con un comando. Va trattato con estremo rispetto e usato il meno possibile.
+
 *Esempio Pratico:*
 Non dai le chiavi della cassaforte al giardiniere.
 L'utente `minecraft` è il giardiniere: può toccare solo il giardino (Server), non la casa (Sistema Operativo).
+Se un hacker ruba la password del giardiniere, al massimo ti rovina le aiuole, non ti svaligia la casa.
 
-- **Root**:
-  - *Zero-Based:* L'Amministratore di Sistema (Superuser). Ha privilegi assoluti e può modificare ogni file. Non usarlo mai per operazioni ordinarie.
-- **Sudo**:
-  - *Zero-Based:* Un meccanismo per ottenere privilegi amministrativi temporanei.
+- **Sudo (SuperUser DO)**:
+  - È il permesso temporaneo. "Per favore, fammi fare questa cosa da amministratore".
+  - Richiede la *tua* password, non quella di Root. Lascia una traccia nei log.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **UID (User ID):** Il numero identificativo di un utente. Root è sempre 0.
@@ -1264,6 +1273,7 @@ L'utente `minecraft` è il giardiniere: può toccare solo il giardino (Server), 
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **Identity Management in Linux.**
+*(Contenuto invariato...)*
 Linux non conosce i nomi ("Mario"), conosce solo i numeri (UID 1000).
 - **`/etc/passwd`:** Contiene le info pubbliche (Nome, UID, Home Directory, Shell).
 - **`/etc/shadow`:** Contiene gli hash delle password. Leggibile *solo* da Root.
@@ -1344,16 +1354,25 @@ Risultato: Backup protetto.
 <a name="modulo-xvi"></a>
 ### **16. MODULO XVI: ADVANCED BASH SCRIPTING: REGEX E PIPE REDIRECTION**
 
+> **[PREREQUISITO FLASH]**
+> **Terminale (Shell):** È l'interfaccia nera dove scrivi i comandi. Non usare il mouse qui. È il modo più veloce e potente per parlare col computer.
+
 *Esempio Pratico:*
 Trovare un errore in un log di 10GB a occhio nudo è impossibile.
 Con Bash costruisci un robot: "Prendi il file -> Cerca 'Error' -> Salva su un foglietto".
+Bash è il linguaggio colla che unisce piccoli programmi per fare grandi cose.
 
-- **Pipe `|`**:
-  - *Zero-Based:* Il passaggio del testimone. Il Corridore A (Cat) passa il testimone al Corridore B (Grep).
-- **Redirection `>`**:
-  - *Zero-Based:* Invece di urlare la risposta, scrivila su questo foglio.
-- **Regex**:
-  - *Zero-Based:* Un metal detector per parole. "Trova tutto ciò che assomiglia a un indirizzo IP".
+- **Pipe `|` (Il Tubo)**:
+  - *Concetto:* Prendi l'output del comando a sinistra e usalo come input per il comando a destra.
+  - *Esempio:* `cat log.txt | grep "Error"` (Leggi il file -> Passalo al cercatore).
+
+- **Redirection `>` (Il Salvataggio)**:
+  - *Concetto:* Invece di stampare a schermo, scrivi su un file.
+  - *Esempio:* `echo "Ciao" > saluti.txt`.
+
+- **Regex (Regular Expressions)**:
+  - *Metal Detector:* Un linguaggio per descrivere pattern di testo.
+  - *Esempio:* `^d{3}-d{2}-d{4}$` trova tutte le date in formato USA, ovunque siano nel testo.
 
 #### 📚 [DIZIONARIO TECNICO]
 > **Stream:** Un flusso di dati.
@@ -1363,10 +1382,11 @@ Con Bash costruisci un robot: "Prendi il file -> Cerca 'Error' -> Salva su un fo
 >
 > **Grep:** Global Regular Expression Print. Il comando di ricerca standard.
 >
-> **Awk:** Un linguaggio di programmazione per manipolare colonne di testo.
+> **Awk:** Un linguaggio di programmazione per manipolare colonne di testo (es. "Stampami solo la terza parola di ogni riga").
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **La Potenza della Pipeline.**
+*(Contenuto invariato...)*
 In Linux, "Everything is a file" e ogni programma deve fare *una* cosa sola e farla bene (UNIX Philosophy).
 Comando complesso: `cat server.log | grep "Exception" | cut -d ':' -f 2 | sort | uniq -c`
 1.  **cat:** Legge il file.
@@ -3260,6 +3280,10 @@ Vuoi creare un arco che spara 3 frecce.
 
 <a name="modulo-lxvi"></a>
 ### **66. Modulo LXVI: Paper API Advanced: Oltre le basi**
+
+> **[PREREQUISITO FLASH]**
+> **API (Application Programming Interface):** È un menu di comandi che un programma offre agli altri. Minecraft offre un'API (Spigot/Paper) che dice "Ecco i comandi per far spawnare uno zombie o inviare un messaggio". Il tuo plugin "ordina" da questo menu.
+
 *Esempio Pratico:*
 Spigot è come un kit di attrezzi base (martello e cacciavite).
 Paper è un'officina robotizzata.
@@ -3276,8 +3300,6 @@ Con Paper, puoi dire "Carica il mondo in background e avvisami quando è pronto"
   - *Risultato:* Un server può reggere 1000 player reali invece di 200. Richiede plugin compatibili.
 
 #### 📚 [DIZIONARIO TECNICO]
-> **API (Application Programming Interface):** Un set di comandi che permette al tuo codice di parlare con un altro software (es. il tuo plugin parla con Minecraft).
->
 > **Asynchronous (Asincrono):** Un'operazione che non blocca il thread principale mentre aspetta il risultato (es. caricamento file, richiesta web).
 >
 > **Main Thread:** Il thread principale di Minecraft che gestisce tutto (movimento, logica, entità). Se si blocca lui, il server lagga.
@@ -3286,6 +3308,7 @@ Con Paper, puoi dire "Carica il mondo in background e avvisami quando è pronto"
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **Paper Async API & Folia Architecture.**
+*(Contenuto invariato...)*
 - **Async Chunk Loading:** Paper ha riscritto il sistema di caricamento dei chunk per usare thread separati per I/O e generazione. Il Main Thread viene avvisato solo quando il chunk è pronto (`CompletableFuture<Chunk>`).
 - **Folia (Regionized Multithreading):**
   - Divide il mondo in regioni indipendenti.
@@ -4018,12 +4041,44 @@ Con Wiki + Bot:
 
 ---
 
-## 🔵 PARTE 6: AI E DEEP LEARNING (IL FUTURO)
+
+## 👾 PARTE 6: INTEGRAZIONE DISCORD & COMMUNITY APPS (NEW)
+*Esempio Pratico:*
+Il tuo server Minecraft è l'isola, ma Discord è il ponte che lo collega al mondo reale.
+Un server senza Discord è come un telefono senza rubrica: nessuno sa chi sei e nessuno può contattarti.
+
+<a name="modulo-lxxxi"></a>
+### **81. Modulo LXXXI: Discord Developer Portal: Applicazioni, Bot e Oauth2**
+*Esempio Pratico:*
+Prima di costruire un robot, devi chiedere il permesso alla fabbrica.
+Il Developer Portal è la fabbrica dove registri il tuo bot e ottieni le chiavi (Token) per farlo funzionare.
+
+<a name="modulo-lxxxii"></a>
+### **82. Modulo LXXXII: JDA (Java Discord API): Creare Bot in Java**
+*Esempio Pratico:*
+Hai imparato Java per i plugin? Ottimo, usa lo stesso linguaggio per il bot!
+JDA è la libreria che traduce "Java" in "Discord".
+
+<a name="modulo-lxxxiii"></a>
+### **83. Modulo LXXXIII: Webhooks & Interactions Bidirezionali: Minecraft to Discord**
+*Esempio Pratico:*
+Un player trova un diamante. Il server manda un messaggio su Discord: "Tizio ha trovato diamanti!".
+Questo è un Webhook: un messaggero a senso unico velocissimo.
+
+<a name="modulo-lxxxiv"></a>
+### **84. Modulo LXXXIV: Slash Commands & Interactions: UX Moderna su Discord**
+*Esempio Pratico:*
+Invece di scrivere "!help" e sperare, scrivi "/" e Discord ti suggerisce i comandi.
+È come passare dal DOS a Windows: più facile, più bello, più professionale.
+
+---
+
+## 🔵 PARTE 7: AI E DEEP LEARNING (IL FUTURO)
 *Esempio Pratico:*
 Immagina un bot che non si limita a bannare chi usa "KillAura", ma che impara a riconoscere il comportamento di un hacker analizzando migliaia di combattimenti, diventando sempre più intelligente ogni giorno. L'AI non segue regole fisse; impara dai dati proprio come farebbe un esperto moderatore umano, ma con la velocità di un supercomputer.
 
-<a name="modulo-lxxxi"></a>
-### **81. Modulo LXXXI: Evoluzione dell'AI: Dai Transformer ai LLM**
+<a name="modulo-lxxxv"></a>
+### **85. Modulo LXXXV: Evoluzione dell'AI: Dai Transformer ai LLM**
 
 *Esempio Pratico:*
 Prima, per tradurre "gatto" in inglese, il computer cercava nel dizionario: "Gatto = Cat".
@@ -4070,8 +4125,8 @@ Nuovo metodo (LLM API):
 ---
 
 
-<a name="modulo-lxxxii"></a>
-### **82. Modulo LXXXII: Deep Learning: Architetture Neurali per Network Admin**
+<a name="modulo-lxxxvi"></a>
+### **86. Modulo LXXXVI: Deep Learning: Architetture Neurali per Network Admin**
 
 *Esempio Pratico:*
 Immagina il cervello umano. Hai miliardi di neuroni. Quando vedi una mela, alcuni neuroni gridano "Rosso!", altri "Tondo!", altri "Frutta!".
@@ -4116,8 +4171,8 @@ Risultato: Ban di cheat "legit" che bypassano i controlli classici.
 ---
 
 
-<a name="modulo-lxxxiii"></a>
-### **83. Modulo LXXXIII: Mathematics of AI: Vettori, Matrici e Tensori**
+<a name="modulo-lxxxvii"></a>
+### **87. Modulo LXXXVII: Mathematics of AI: Vettori, Matrici e Tensori**
 
 *Esempio Pratico:*
 Come descrivi un Player a un computer?
@@ -4163,8 +4218,8 @@ Ban automatico o Flag per review.
 ---
 
 
-<a name="modulo-lxxxiv"></a>
-### **84. Modulo LXXXIV: Activation Functions e Non-Linearità**
+<a name="modulo-lxxxviii"></a>
+### **88. Modulo LXXXVIII: Activation Functions e Non-Linearità**
 
 *Esempio Pratico:*
 Un neurone deve decidere: "Lascio passare questo segnale o no?".
@@ -4206,8 +4261,8 @@ Senza Softmax, i numeri sarebbero arbitrari (es. 5.4, 2.1, -3.0) e difficili da 
 ---
 
 
-<a name="modulo-lxxxv"></a>
-### **85. Modulo LXXXV: Training Process: Loss, Optimizer e Overfitting**
+<a name="modulo-lxxxix"></a>
+### **89. Modulo LXXXIX: Training Process: Loss, Optimizer e Overfitting**
 
 *Esempio Pratico:*
 Come impari a tirare con l'arco in Minecraft?
@@ -4251,8 +4306,8 @@ Soluzione: Usare un Validation Set bilanciato e tecniche di regolarizzazione per
 ---
 
 
-<a name="modulo-lxxxvi"></a>
-### **86. Modulo LXXXVI: Stochastic Gradient Descent e Algoritmi Adattivi**
+<a name="modulo-xc"></a>
+### **90. Modulo XC: Stochastic Gradient Descent e Algoritmi Adattivi**
 
 *Esempio Pratico:*
 Sei in cima a una montagna nebbiosa e devi scendere a valle (trovare la soluzione perfetta).
@@ -4292,8 +4347,8 @@ Se usi Mini-Batch SGD (Batch Size = 64): Fai un passo ogni 64 log. Fai milioni d
 ---
 
 
-<a name="modulo-lxxxvii"></a>
-### **87. Modulo LXXXVII: Evaluation Metrics: Precision, Recall e F1-Score**
+<a name="modulo-xci"></a>
+### **91. Modulo XCI: Evaluation Metrics: Precision, Recall e F1-Score**
 
 *Esempio Pratico:*
 Hai un Anti-Cheat.
@@ -4334,8 +4389,8 @@ Gli altri 30% (casi dubbi) li mandi in una coda per review manuale dagli Staffer
 ---
 
 
-<a name="modulo-lxxxviii"></a>
-### **88. Modulo LXXXVIII: Regularization: Dropout, L1/L2 e Batch Norm**
+<a name="modulo-xcii"></a>
+### **92. Modulo XCII: Regularization: Dropout, L1/L2 e Batch Norm**
 
 *Esempio Pratico:*
 Se uno studente impara a memoria, non sa ragionare.
@@ -4373,8 +4428,8 @@ Con Dropout: L'accuratezza sul Validation Set aumenta dal 85% al 92% perché la 
 ---
 
 
-<a name="modulo-lxxxix"></a>
-### **89. Modulo LXXXIX: Computer Vision: Pattern Recognition per Anti-Cheat**
+<a name="modulo-xciii"></a>
+### **93. Modulo XCIII: Computer Vision: Pattern Recognition per Anti-Cheat**
 
 *Esempio Pratico:*
 Un Admin guarda un video e vede che il player "scatta" in modo innaturale (Killaura).
@@ -4415,8 +4470,8 @@ Il sistema flagga lo screenshot e lo manda agli admin.
 ---
 
 
-<a name="modulo-xc"></a>
-### **90. Modulo XC: Natural Language Processing (NLP): Chat Moderation 2.0**
+<a name="modulo-xciv"></a>
+### **94. Modulo XCIV: Natural Language Processing (NLP): Chat Moderation 2.0**
 
 *Esempio Pratico:*
 Player A: "Ti uccido!" (Minaccia reale? O scherzo in PvP?).
@@ -4457,8 +4512,8 @@ Classifica il messaggio come "Toxic/Sarcastic" e invia un avvertimento, invece d
 ---
 
 
-<a name="modulo-xci"></a>
-### **91. Modulo XCI: Transformer Architecture e Self-Attention**
+<a name="modulo-xcv"></a>
+### **95. Modulo XCV: Transformer Architecture e Self-Attention**
 
 *Esempio Pratico:*
 Quando leggi una frase lunga, il tuo cervello si ricorda l'inizio mentre legge la fine.
@@ -4498,8 +4553,8 @@ Un Transformer, grazie alla Self-Attention, può collegare l'evento "Login" all'
 ---
 
 
-<a name="modulo-xcii"></a>
-### **92. Modulo XCII: Generative AI e LLM (Large Language Models)**
+<a name="modulo-xcvi"></a>
+### **96. Modulo XCVI: Generative AI e LLM (Large Language Models)**
 
 *Esempio Pratico:*
 Invece di scrivere 100 risposte pre-fatte per un NPC ("Ciao", "Vattene", "Comprami"), usi un LLM.
@@ -4535,8 +4590,8 @@ L'LLM risponde: "Per creare una gilda, usa il comando `/g create <nome>` come sp
 ---
 
 
-<a name="modulo-xciii"></a>
-### **93. Modulo XCIII: Prompt Engineering Strategico**
+<a name="modulo-xcvii"></a>
+### **97. Modulo XCVII: Prompt Engineering Strategico**
 
 *Esempio Pratico:*
 Parlare con l'AI è un'arte.
@@ -4571,8 +4626,8 @@ Risposta: "Un contadino ha perso l'anello nuziale nello stomaco di uno Slime gig
 ---
 
 
-<a name="modulo-xciv"></a>
-### **94. Modulo XCIV: AI-Powered Anti-Cheat: Comportamento vs Firme**
+<a name="modulo-xcviii"></a>
+### **98. Modulo XCVIII: AI-Powered Anti-Cheat: Comportamento vs Firme**
 
 *Esempio Pratico:*
 - **Firme (Vecchio)**: "Se hai il file `killaura.exe`, sei bannato". (Facile da aggirare rinominando il file).
@@ -4608,8 +4663,8 @@ L'errore di ricostruzione sale alle stelle -> Flag.
 ---
 
 
-<a name="modulo-xcv"></a>
-### **95. Modulo XCV: Predictive Analytics e Business Intelligence**
+<a name="modulo-xcix"></a>
+### **99. Modulo XCIX: Predictive Analytics e Business Intelligence**
 
 *Esempio Pratico:*
 Netflix sa cosa vuoi vedere prima di te.
@@ -4652,12 +4707,12 @@ Risultato: Il player torna a giocare (Retention salvata).
 
 ---
 
-## ⚪ PARTE 7: LEADERSHIP E PROFESSIONALITÀ
+## ⚪ PARTE 8: LEADERSHIP E PROFESSIONALITÀ
 *Esempio Pratico:*
 Puoi avere i plugin migliori del mondo, ma se il tuo team di staffer litiga ogni giorno o se non sai gestire il budget, il tuo server fallirà in meno di un mese. La Leadership è l'arte di far funzionare le persone tanto bene quanto fai funzionare il codice.
 
-<a name="modulo-xcvi"></a>
-### **96. Modulo XCVI: Management 3.0: Leadership in Network Decentralizzati**
+<a name="modulo-c"></a>
+### **100. Modulo C: Management 3.0: Leadership in Network Decentralizzati**
 
 *Esempio Pratico:*
 Invece di dire ai tuoi staffer "fate questo perché lo dico io", dai loro un obiettivo: "Entro fine mese dobbiamo raddoppiare i player nel Survival". Lascia che siano loro a proporre le idee. Tu sei l'arbitro, non il dittatore.
@@ -4695,8 +4750,8 @@ Risultato: Staff motivato, soluzione migliore.
 ---
 
 
-<a name="modulo-xcvii"></a>
-### **97. Modulo XCVII: HR Strategy: Recruitment e Onboarding Master**
+<a name="modulo-ci"></a>
+### **101. Modulo CI: HR Strategy: Recruitment e Onboarding Master**
 
 *Esempio Pratico:*
 Assumere un amico solo perché è simpatico è il modo più veloce per distruggere un server. Devi trattare il tuo staff come una vera azienda: provini tecnici, periodi di prova e obiettivi chiari.
@@ -4741,8 +4796,8 @@ Risultato: Gli Admin non perdono tempo con i perditempo.
 ---
 
 
-<a name="modulo-xcviii"></a>
-### **98. Modulo XCVIII: Delegare e Scalabilità Organizzativa**
+<a name="modulo-cii"></a>
+### **102. Modulo CII: Delegare e Scalabilità Organizzativa**
 
 *Esempio Pratico:*
 Se il server crasha alle 3 di notte e tu sei l'unico che ha la password per riavviarlo, hai fallito come leader. Devi fare in modo che il server possa sopravvivere anche se tu sparisci per una settimana.
@@ -4785,8 +4840,8 @@ Con delega (Bus Factor > 1):
 ---
 
 
-<a name="modulo-xcix"></a>
-### **99. Modulo XCIX: Comunicazione Efficace e Crisis Management**
+<a name="modulo-ciii"></a>
+### **103. Modulo CIII: Comunicazione Efficace e Crisis Management**
 
 *Esempio Pratico:*
 Il server viene bucato da un hacker. Se scappi e chiudi Discord, è la fine. Se scrivi subito "Ci hanno bucato, stiamo risolvendo, nessuno perderà nulla", diventi un eroe.
@@ -4827,8 +4882,8 @@ Il server viene bucato da un hacker. Se scappi e chiudi Discord, è la fine. Se 
 ---
 
 
-<a name="modulo-c"></a>
-### **100. Modulo C: Intelligenza Emotiva e Stress del Launch Day**
+<a name="modulo-civ"></a>
+### **104. Modulo CIV: Intelligenza Emotiva e Stress del Launch Day**
 
 *Esempio Pratico:*
 Giorno del lancio: lag, crash, insulti. Se tu urli, lo staff urla. Se tu sei calmo, lo staff si calma. Sei il termostato emotivo del team.
@@ -4862,8 +4917,8 @@ Sviluppato dall'US Air Force per i combattimenti aerei, perfetto per i SysAdmin 
 ---
 
 
-<a name="modulo-ci"></a>
-### **101. Modulo CI: Salute Mentale e Prevenzione del Burnout**
+<a name="modulo-cv"></a>
+### **105. Modulo CV: Salute Mentale e Prevenzione del Burnout**
 
 *Esempio Pratico:*
 Lavorare 15 ore al giorno ti farà odiare Minecraft. Se odi il tuo server, lo lascerai morire. Riposare è parte del lavoro.
@@ -4899,8 +4954,8 @@ Lavorare 15 ore al giorno ti farà odiare Minecraft. Se odi il tuo server, lo la
 ---
 
 
-<a name="modulo-cii"></a>
-### **102. Modulo CII: Financial Planning: Budgeting e Cash Flow**
+<a name="modulo-cvi"></a>
+### **106. Modulo CVI: Financial Planning: Budgeting e Cash Flow**
 
 *Esempio Pratico:*
 Guadagni 1000€ e li spendi in plugin. Il mese dopo ne guadagni 100€ e non puoi pagare l'host. Il server chiude. Devi avere un "cuscinetto".
@@ -4938,8 +4993,8 @@ Guadagni 1000€ e li spendi in plugin. Il mese dopo ne guadagni 100€ e non pu
 ---
 
 
-<a name="modulo-ciii"></a>
-### **103. Modulo CIII: Monetizzazione Etica e EULA Master**
+<a name="modulo-cvii"></a>
+### **107. Modulo CVII: Monetizzazione Etica e EULA Master**
 
 *Esempio Pratico:*
 Vendere spade "OP" (Pay-to-Win) fa soldi subito ma uccide il server dopo un mese (i poveri se ne vanno, i ricchi si annoiano). Vendere cappelli belli (Cosmetici) fa soldi per sempre.
@@ -4973,8 +5028,8 @@ Vendere spade "OP" (Pay-to-Win) fa soldi subito ma uccide il server dopo un mese
 ---
 
 
-<a name="modulo-civ"></a>
-### **104. Modulo CIV: Marketing, Branding e Community Growth**
+<a name="modulo-cviii"></a>
+### **108. Modulo CVIII: Marketing, Branding e Community Growth**
 
 *Esempio Pratico:*
 Il marketing non è spammare IP sugli altri server. È fare un TikTok divertente che fa dire alla gente "Voglio giocarci!".
@@ -5009,7 +5064,7 @@ Il marketing non è spammare IP sugli altri server. È fare un TikTok divertente
 ---
 
 
-<a name="modulo-cv"></a>
+<a name="modulo-cix"></a>
 ### **109. Modulo CIX: Career Path: Dal Server al Mondo Professionale**
 
 *Esempio Pratico:*
@@ -5042,7 +5097,7 @@ Gestire un server non è un gioco. Stai facendo il SysAdmin, il Manager, il Cont
 ---
 
 
-<a name="modulo-cvi"></a>
+<a name="modulo-cx"></a>
 ### **110. Modulo CX: Personal Branding e Networking su LinkedIn/GitHub**
 
 *Esempio Pratico:*
@@ -5080,8 +5135,8 @@ Su LinkedIn non scrivere "Ho un server". Scrivi "Fondatore di una piattaforma di
 ---
 
 
-<a name="modulo-cvii"></a>
-### **107. Modulo CVII: Kaizen Mindset e Growth Mindset**
+<a name="modulo-cxi"></a>
+### **111. Modulo CXI: Kaizen Mindset e Growth Mindset**
 *Esempio Pratico:*
 Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorno. Dopo un anno sarai un gigante.
 
@@ -5092,250 +5147,63 @@ Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorn
 
 
 <a name="modulo-cviii"></a>
-### **108. Modulo CVIII: Terraform: Infrastructure as Code (IaC) e Provisioning**
-
-*Esempio Pratico:*
-Configurare un server cliccando bottoni nel pannello dell'host è come costruire una casa di Lego a mano. Se cade, devi rifarla da zero.
-Terraform è come avere il file di salvataggio del mondo. Scrivi `server.txt`, lanci un comando, e il server appare magicamente. Se si rompe, ne crei uno identico in 1 secondo.
-
-- **Immutable Infrastructure**:
-  - *Concetto:* I server non si riparano, si sostituiscono. Come i fazzoletti.
-- **State File**:
-  - *Uso:* Il cervello di Terraform che ricorda cosa ha costruito.
-
-#### 📚 [DIZIONARIO TECNICO]
-> **IaC (Infrastructure as Code):** Gestire l'infrastruttura (server, reti, firewall) tramite file di configurazione leggibili dal computer, invece che configurazione manuale.
->
-> **Provisioning:** Il processo di creazione e configurazione delle risorse IT (es. accendere una VPS su OVH, installare Java).
->
-> **Provider:** Il plugin che permette a Terraform di parlare con le API dei cloud provider (AWS, Google Cloud, Hetzner, Cloudflare).
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Declarative vs Imperative.**
-- **Imperativo (Bash Script):** Dici *come* fare. "Scarica Java, poi installalo, poi apri la porta 25565". Se lo lanci due volte, si rompe.
-- **Dichiarativo (Terraform):** Dici *cosa* vuoi. "Voglio un server con Java e porta 25565 aperta". Terraform calcola come arrivarci. Se lo lanci due volte, non fa nulla (idempotenza).
-- **HCL (HashiCorp Configuration Language):** La sintassi usata da Terraform.
-  ```hcl
-  resource "hcloud_server" "lobby" {
-    name        = "lobby-01"
-    image       = "ubuntu-22.04"
-    server_type = "cpx11"
-  }
-  ```
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Apertura di un secondo Proxy per gestire il traffico.
-- Metodo Vecchio: Vai sul sito dell'host, compri la VPS, aspetti l'email, logghi con SSH, installi tutto a mano (1 ora).
-- Metodo Terraform: Cambi `count = 1` in `count = 2` nel file `.tf`. Esegui `terraform apply`. In 30 secondi il nuovo proxy è online e configurato.
 
 ---
 
-<a name="modulo-cix"></a>
-### **113. Modulo CXIII: Prometheus & Grafana: Telemetria Avanzata e Alerting**
-
+## 🚀 PARTE 9: ADVANCED DEVOPS & INFRASTRUCTURE AS CODE (NEW)
 *Esempio Pratico:*
-Guidare un server senza Grafana è come guidare un'auto con il parabrezza oscurato e senza tachimetro. Vai a sensazione finché non ti schianti.
-Con Grafana hai un cruscotto spaziale che ti dice tutto: velocità (TPS), benzina (RAM), temperatura (CPU).
+Quando hai 1 server, lo gestisci a mano.
+Quando ne hai 100, se li gestisci a mano impazzisci.
+DevOps è l'arte di gestire 1000 server come se fossero uno solo, scrivendo codice invece di cliccare bottoni.
 
-- **Time Series Database (TSDB)**:
-  - *Zero-Based:* Un database speciale ottimizzato per salvare numeri nel tempo (es. CPU alle 10:00, CPU alle 10:01).
-- **Alerting**:
-  - *Uso:* Ricevere una notifica su Discord se la RAM supera il 90%.
-
-#### 📚 [DIZIONARIO TECNICO]
-> **Metric:** Un dato misurabile nel tempo (es. `minecraft_tps`, `jvm_memory_used`).
->
-> **Exporter:** Un piccolo programma che legge i dati dal server (es. dal plugin Spark) e li espone per Prometheus.
->
-> **Scraping:** L'azione di Prometheus che "va a prendere" i dati dagli exporter ogni X secondi.
->
-> **Dashboard:** La visualizzazione grafica dei dati su Grafana (grafici a torta, istogrammi).
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Observability Pillars: Metrics, Logs, Traces.**
-- Prometheus si occupa delle **Metrics**.
-- Architettura Pull-Based:
-  - A differenza di altri sistemi (Push) dove il server invia i dati, qui è Prometheus che li chiede.
-  - Vantaggio: Se il server è sovraccarico, non viene "DDoSato" dal sistema di monitoring.
-- **PromQL (Prometheus Query Language):**
-  - `rate(minecraft_packets_received_total[5m])`: Calcola la media dei pacchetti ricevuti negli ultimi 5 minuti.
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Memory Leak lento.
-- Senza Grafana: Il server crasha ogni 3 giorni. Non sai perché.
-- Con Grafana: Vedi un grafico "a dente di sega" dove la RAM minima sale lentamente del 1% ogni ora.
-- Diagnosi: Un plugin non rilascia oggetti HashMap. Fixato prima del crash.
-
----
-
-<a name="modulo-cx"></a>
-### **110. Modulo CX: CI/CD Pipelines: GitHub Actions, Jenkins e Automazione**
-
+<a name="modulo-cxii"></a>
+### **112. Modulo CXII: Terraform: Infrastructure as Code**
 *Esempio Pratico:*
-Ogni volta che modifichi un plugin, devi: Compilare, Testare, Stoppare il server, Caricare il file, Riavviare. Che noia.
-La CI/CD è un robot che fa tutto questo per te ogni volta che salvi il codice.
+Invece di comprare un server, installare Linux, aprire le porte...
+Scrivi un file di testo: "Voglio 3 server con Linux e porta 25565 aperta".
+Terraform legge il file e crea tutto in 3 minuti. Magia.
 
-- **CI (Continuous Integration)**:
-  - *Concetto:* Il robot controlla se il tuo codice compila e supera i test.
-- **CD (Continuous Deployment)**:
-  - *Concetto:* Il robot mette il codice sul server live.
+<a name="modulo-cxiii"></a>
+### **113. Modulo CXIII: Docker & Kubernetes: Container Orchestration**
+*Esempio Pratico:*
+Docker è come un container navale: ci metti dentro il tuo server Minecraft e lo puoi spedire ovunque (AWS, Google, PC di casa) senza cambiare nulla.
+Kubernetes è la gru del porto che sposta i container dove servono automaticamente.
 
-#### 📚 [DIZIONARIO TECNICO]
-> **Pipeline:** Una sequenza di passi automatici (es. Build -> Test -> Deploy).
->
-> **Runner:** Il server che esegue fisicamente la pipeline (può essere GitHub o un tuo server privato).
->
-> **Artifact:** Il risultato della build (es. il file `.jar` del plugin).
->
-> **Linter:** Un tool che controlla se hai scritto il codice in modo ordinato (es. Checkstyle).
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**The DevOps Lifecycle.**
-- **GitHub Actions Workflow (`.yml`):**
-  ```yaml
-  name: Build & Deploy
-  on: [push]
-  jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - name: Set up JDK 17
-          uses: actions/setup-java@v3
-        - name: Build with Maven
-          run: mvn -B package
-        - name: SCP to Server
-          uses: appleboy/scp-action@master
-          with:
-            host: ${{ secrets.HOST }}
-            source: "target/*.jar"
-            target: "/home/minecraft/plugins/"
-  ```
-- Questo script fa risparmiare ore di lavoro manuale e azzera gli errori umani ("Ops, ho caricato il jar sbagliato").
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Bug Fix urgente venerdì sera.
-- Sviluppatore stanco. Fixa il bug ma dimentica di compilare l'ultima versione. Carica quella vecchia. Il bug rimane. Panico.
-- Con CI/CD: Lo sviluppatore committa il fix. GitHub Actions compila (ambiente pulito), esegue i test (falliscono se il fix non va), e deploya solo se è tutto verde. Sicurezza matematica.
-
----
+<a name="modulo-cxiv"></a>
+### **114. Modulo CXIV: Prometheus & Grafana: Monitoring Stack**
+*Esempio Pratico:*
+Il cruscotto della tua auto ti dice velocità e benzina.
+Grafana è il cruscotto del tuo network: CPU, RAM, Player Online, TPS. Tutto in tempo reale, bellissimo da vedere.
 
 <a name="modulo-cxv"></a>
-### **115. Modulo CXV: Serverless Architecture: AWS Lambda, Cloudflare Workers**
-
+### **115. Modulo CXV: CI/CD Pipelines (GitHub Actions)**
 *Esempio Pratico:*
-Hai bisogno di un sito web solo per far votare i player una volta al giorno.
-Pagare un server acceso 24/7 è come tenere l'auto accesa in garage per usarla 5 minuti.
-Serverless è come Uber: paghi solo per quei 5 minuti di viaggio.
-
-- **FaaS (Function as a Service)**:
-  - *Zero-Based:* Carichi solo il codice di una funzione (`vota()`). Il cloud provider la esegue solo quando qualcuno la chiama.
-
-#### 📚 [DIZIONARIO TECNICO]
-> **Cold Start:** Il tempo (millisecondi) che ci mette la funzione a "svegliarsi" se nessuno la usa da un po'.
->
-> **Edge Computing:** Eseguire il codice non in un data center in America, ma in centinaia di server sparsi per il mondo, vicini all'utente (es. Cloudflare Workers).
->
-> **Scalabilità Infinita:** Se 1 persona chiama la funzione, parte 1 istanza. Se 1 milione di persone la chiamano, partono 1 milione di istanze. Automaticamente.
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Event-Driven Architecture.**
-- Non c'è un server che "aspetta". Tutto è scatenato da eventi (HTTP Request, Database Update, Timer).
-- **Cloudflare Workers (JavaScript/WASM):**
-  - Ideale per API leggere, redirect, o manipolazione di header HTTP.
-  - Esempio: Un Worker che intercetta le richieste al tuo store e applica sconti dinamici in base al paese dell'utente.
-  - Costo: Spesso gratuito fino a 100k richieste/giorno.
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** API per le Statistiche dei Player.
-- Hosting Tradizionale: Node.js server su VPS. Se arrivano 10k richieste insieme, crasha o lagga. Costo: 10€/mese.
-- Serverless (AWS Lambda): Le 10k richieste vengono gestite in parallelo da 10k lambda. Nessun crash. Costo: 0.50€/mese (paghi solo i millisecondi di esecuzione).
-
----
+Modifichi il codice del plugin.
+Invece di compilare, scaricare, caricare con FTP, riavviare...
+Fai "git push".
+GitHub Actions fa tutto il resto: compila, testa, carica e riavvia. Tu vai a prendere il caffè.
 
 <a name="modulo-cxvi"></a>
 ### **116. Modulo CXVI: Scaling Strategies: Horizontal vs Vertical Scaling Patterns**
-
 *Esempio Pratico:*
-Il tuo cavallo (Server) non riesce a tirare il carro (Troppi player).
-- **Vertical Scaling:** Compri un cavallo più grande e muscoloso (CPU più potente). Ha un limite fisico (i cavalli giganti non esistono).
-- **Horizontal Scaling:** Compri 10 cavalli normali e li attacchi allo stesso carro (Più server collegati). Limite quasi infinito.
-
-- **Sharding**:
-  - *Concetto:* Dividere il carico a pezzi. I player A-M vanno sul Server 1, N-Z sul Server 2.
-
-#### 📚 [DIZIONARIO TECNICO]
-> **Scale Up (Vertical):** Aggiungere risorse (CPU, RAM) alla stessa macchina. Facile ma costoso e limitato.
->
-> **Scale Out (Horizontal):** Aggiungere più macchine al cluster. Complesso da gestire (serve Load Balancer) ma scalabile all'infinito.
->
-> **Load Balancer:** Il vigile urbano che smista il traffico tra i vari server (es. Nginx, Velocity Proxy).
->
-> **Bottleneck (Collo di Bottiglia):** Il componente più lento che rallenta tutto il sistema (spesso il Database o il Disk I/O).
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Database Scaling Patterns.**
-- Minecraft è single-threaded, quindi lo scaling orizzontale dei server di gioco è naturale (BungeeCord).
-- Il problema vero è il Database (dove salviamo i soldi, i permessi).
-- **Read Replicas:**
-  - 1 Master (Scrittura) + 3 Slaves (Lettura).
-  - Quando un player entra, LuckPerms legge i permessi da uno Slave (veloce).
-  - Quando un player compra un rank, LuckPerms scrive sul Master (che poi copia sugli Slave).
-- **Sharding:**
-  - Database "Survival" su Server A. Database "SkyBlock" su Server B.
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Lancio di una modalità "Battle Royale" con 1000 player.
-- Vertical: Compri un i9-14900K. Regge 200 player. Lagga.
-- Horizontal: Crei 10 istanze Docker da 100 player l'una. Velocity smista i player nelle istanze libere.
-- Risultato: 1000 player giocano fluidi. Se ne arrivano altri 100, accendi l'11° container (Auto-Scaling).
-
----
-
-### **CONCLUSIONE: IL VERO INIZIO**
-
-Hai completato il percorso. Da un semplice server `server.properties` sei arrivato a progettare infrastrutture scalabili, sicure e automatizzate.
-Ma ricorda: nel mondo DevOps e dell'ingegneria del software, l'unica costante è il cambiamento.
-Quello che hai imparato oggi è la fondazione; domani uscirà una nuova tecnologia, un nuovo exploit, una nuova versione di Java.
-
-Non smettere mai di essere curioso. Rompi le cose (in ambiente di test). Aggiusta le cose. Ottimizza.
+Hai troppi player.
+- **Vertical Scaling:** Compri un server più potente (CPU più veloce). Costa tanto, ha un limite fisico.
+- **Horizontal Scaling:** Compri 10 server piccoli e distribuisci i player (BungeeCord/Velocity). Scalabilità quasi infinita.
 
 ---
 
 <a name="appendice-risorse"></a>
-### **APPENDICE: BIBLIOTECA DELL'INGEGNERE (RISORSE CONSIGLIATE)**
+### **117. Appendice: Biblioteca dell'Ingegnere (Risorse Consigliate)**
+*Libri Fondamentali:*
+- ["Clean Code" di Robert C. Martin](https://www.amazon.it/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) - *Il testo sacro sulla qualità del codice.*
+- ["The Linux Command Line" di William Shotts](https://linuxcommand.org/tlcl.php) - *La bibbia per padroneggiare la shell (Disponibile gratis in PDF).*
+- ["Java: The Complete Reference"](https://www.oracle.com/java/technologies/java-reference-guides.html) - *Manuale di riferimento completo.*
 
-Ecco una selezione curata di risorse per approfondire i moduli trattati.
-
-#### ☕ **1. Java Development (Plugin & Core)**
-*   🇮🇹 **[HTML.it - Guida Java](https://www.html.it/guide/guida-java/)**: Ottimo punto di partenza in italiano per le basi.
-*   🇺🇸 **[Oracle Java Documentation](https://docs.oracle.com/en/java/)**: La bibbia ufficiale. Complessa ma necessaria.
-*   🇺🇸 **[Baeldung](https://www.baeldung.com/)**: Tutorial avanzati su Java e Spring. Il "StackOverflow" dei tutorial di qualità.
-
-#### 🐍 **2. Python (Scripting & Automation)**
-*   🇮🇹 **[Python.it](https://www.python.it/)**: Documentazione e community italiana.
-*   🇺🇸 **[Real Python](https://realpython.com/)**: Guide pratiche eccellenti per risolvere problemi reali.
-*   🇺🇸 **[Automate the Boring Stuff](https://automatetheboringstuff.com/)**: Il miglior libro (gratis online) per imparare Python per l'automazione di sistema.
-
-#### 🐧 **3. Linux & System Administration**
-*   🌍 **[Linux Journey](https://linuxjourney.com/)**: (Disponibile in IT/EN) Il miglior sito interattivo per imparare Linux da zero.
-*   🇺🇸 **[Explainshell](https://explainshell.com/)**: Incolla un comando bash e ti spiega cosa fa ogni singola flag.
-*   🇺🇸 **[Red Hat Sysadmin Blog](https://www.redhat.com/sysadmin/)**: Articoli di alto livello sulla gestione server Enterprise.
-
-#### 🌐 **4. Networking & Security**
-*   🌍 **[Cloudflare Learning](https://www.cloudflare.com/learning/)**: (IT/EN) Spiegazioni chiarissime su DNS, DDoS, SSL e CDN.
-*   🇺🇸 **[OWASP Top 10](https://owasp.org/www-project-top-ten/)**: La lista delle 10 vulnerabilità più critiche da conoscere.
-
-#### 🏗️ **5. DevOps & Infrastructure (Docker, Terraform)**
-*   🇺🇸 **[Docker Docs](https://docs.docker.com/)**: Documentazione ufficiale, molto ben fatta con "Get Started".
-*   🇺🇸 **[HashiCorp Learn](https://developer.hashicorp.com/terraform/tutorials)**: Tutorial interattivi per Terraform.
-*   🇺🇸 **[Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/)**: Tutorial interattivo ufficiale per K8s.
-
-#### 🎮 **6. Minecraft Server Internals**
-*   🇺🇸 **[PaperMC Docs](https://docs.papermc.io/)**: Documentazione per l'API più usata (Paper/Spigot).
-*   🇺🇸 **[Wiki.vg](https://wiki.vg/Main_Page)**: Documentazione tecnica del protocollo di rete di Minecraft. Per chi vuole capire i pacchetti.
+*Documentazione Ufficiale & Tutorial:*
+- [PaperMC Documentation](https://docs.papermc.io/) - *La guida ufficiale per l'ottimizzazione del server.*
+- [SpigotMC Javadocs](https://hub.spigotmc.org/javadocs/spigot/) - *Riferimento API per lo sviluppo di plugin.*
+- [Baeldung (Java Tutorials)](https://www.baeldung.com/) - *Le migliori guide Java/Spring sul web.*
+- [Linux Journey](https://linuxjourney.com/) - *Corso interattivo gratuito per imparare Linux.*
+- [Hypixel Dev Blog](https://hypixel.net/forums/code-creations.65/) - *Case studies reali su infrastrutture Minecraft enormi.*
 
 ---
-
-**FINE DEL MASTER COURSE**
-*Congratulazioni, Ingegnere. Ora costruisci l'impossibile.*
