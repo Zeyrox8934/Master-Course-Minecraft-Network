@@ -1,0 +1,21 @@
+# Configurazione Avanzata Lobby - Stile CoralMC
+# Da applicare tramite WorldGuard o plugin di gestione Lobby
+
+# Regole Globali (Flags)
+build: deny
+pvp: deny
+mob-spawning: deny
+item-drop: deny
+item-pickup: deny
+hunger-drain: false
+fall-damage: false
+fire-spread: false
+
+# Messaggi personalizzati
+deny-message: "§c[Fracture] §7Non puoi farlo nella Lobby!"
+
+# Impostazioni Spawn (Stile Coral)
+spawn-on-join: true
+teleport-to-spawn-on-join: true
+# Forza il punto di spawn su un unico blocco
+force-spawn-location: true

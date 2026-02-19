@@ -1,0 +1,14 @@
+# Purpur Config - Lifesteal Edition
+settings:
+  lag-compensation: true
+world-settings:
+  default:
+    # Impostazioni per rendere il PvP più fluido
+    mobs-can-always-pick-up-loot: false
+    # Velocizza il respawn per mantenere l'azione alta
+    controllable-stray-with-empty-hand: true
+    # Disabilita alcune meccaniche che pesano sulla CPU durante i fight
+    entities-can-use-portals: false
+    # Gameplay Lifesteal
+    allow-piston-duplication: false
+    teleport-if-outside-border: true

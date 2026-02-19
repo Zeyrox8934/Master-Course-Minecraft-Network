@@ -3738,6 +3738,13 @@ BungeeGuard e Firewall murano la porta sul retro.
 - **Rate Limiting**:
   - *Concetto:* Limitare la velocità delle richieste.
   - *Zero-Based:* Il tornello della metro. Passa una persona alla volta. Se provano a spingere in 100, il tornello si blocca e nessuno entra.
+  - *Implementation (IPTables):*
+    ```bash
+    # Limita le nuove connessioni a 5 al secondo per IP
+    iptables -A INPUT -p tcp --dport 25565 -m state --state NEW -m hashlimit \
+    --hashlimit-above 5/sec --hashlimit-burst 10 --hashlimit-mode srcip \
+    --hashlimit-name MinecraftRateLimit -j DROP
+    ```
 
 #### 📚 [DIZIONARIO TECNICO]
 > **Firewall:** Un sistema di sicurezza di rete che monitora e controlla il traffico in entrata e in uscita basato su regole di sicurezza predeterminate.
@@ -4042,31 +4049,151 @@ Con Wiki + Bot:
 ---
 
 
-## 👾 PARTE 6: INTEGRAZIONE DISCORD & COMMUNITY APPS (NEW)
+## 💾 PARTE 6: DATA MANAGEMENT & PERSISTENCE
+*Esempio Pratico:*
+Se il server crasha, i player si arrabbiano. Se il database si corrompe, i player se ne vanno per sempre.
+I dati sono l'asset più prezioso del tuo server. Non perderli.
+
+<a name="modulo-lxxxi"></a>
+### **81. Modulo LXXXI: MySQL & Relational Databases: Le Fondamenta**
+*Esempio Pratico:*
+Un file YAML va bene per la config, ma se hai 10.000 player, cercare "Mario" in un file di testo richiede secondi.
+MySQL lo trova in millisecondi grazie agli indici. È la differenza tra cercare un nome in un'agenda disordinata e cercarlo su Google.
+
+- **ACID Transactions**:
+  - *Concetto:* O tutto o niente. Se un player compra un rank, i soldi devono uscire E il rank deve arrivare. Se il server crasha a metà, l'operazione si annulla. Niente soldi persi, niente rank regalati.
+- **Normalization**:
+  - *Zero-Based:* Non salvare "Mario ha la spada di diamante" 100 volte. Salva "Mario ID=1" e "Spada ID=5". Risparmi spazio e eviti errori.
+
+<a name="modulo-lxxxii"></a>
+### **82. Modulo LXXXII: Redis & In-Memory Caching: Velocità Pura**
+*Esempio Pratico:*
+Chiedere al Database ogni volta "Quanti soldi ha Mario?" è lento (legge dal disco).
+Chiedere a Redis è istantaneo (legge dalla RAM).
+Usa Redis per le cose che cambiano spesso (Chat, Posizione, Soldi temporanei).
+
+- **Key-Value Store**:
+  - *Concetto:* Un dizionario gigante in memoria. Chiave: "player:mario:money", Valore: "100".
+- **Pub/Sub (Publish/Subscribe)**:
+  - *Uso:* Il server Survival dice "Mario è entrato!" (Publish). Il Proxy ascolta (Subscribe) e aggiorna la tablist di tutti.
+
+<a name="modulo-lxxxiii"></a>
+### **83. Modulo LXXXIII: NoSQL vs SQL: MongoDB e oltre**
+*Esempio Pratico:*
+MySQL è rigido (Tabelle, Colonne). Se vuoi aggiungere "Numero di scarpe" al player, devi cambiare tutta la tabella.
+MongoDB è flessibile (Documenti JSON). Puoi salvare quello che vuoi. Ottimo per i log o statistiche complesse.
+
+- **Document Store**:
+  - *Zero-Based:* Salva i dati come file JSON. Facile da leggere per gli umani, facile da modificare per i dev.
+
+<a name="modulo-lxxxiv"></a>
+### **84. Modulo LXXXIV: Data Migration & Versioning (Flyway)**
+*Esempio Pratico:*
+Aggiorni il plugin e cambia la struttura del database.
+Se lo fai a mano, spacchi tutto.
+Flyway è come Git per il database: applica le modifiche in ordine e tiene traccia della versione.
+
+---
+
+## 📊 PARTE 7: MONITORING & OBSERVABILITY
+*Esempio Pratico:*
+Guidare un server senza monitoring è come guidare un'auto bendati.
+Senti il rumore del motore (ventole del server), ma non sai se stai andando a 100 km/h o se hai finito la benzina (RAM).
+
+<a name="modulo-lxxxv"></a>
+### **85. Modulo LXXXV: The Three Pillars: Logs, Metrics, Traces**
+*Esempio Pratico:*
+- **Logs:** "Cosa è successo?" (Errore: NullPointerException).
+- **Metrics:** "Cosa sta succedendo?" (CPU al 90%).
+- **Traces:** "Dove è successo?" (Il player ha cliccato l'NPC -> Il server ha chiamato il DB -> Il DB ha risposto lento).
+
+<a name="modulo-lxxxvi"></a>
+### **86. Modulo LXXXVI: Prometheus & Grafana Stack**
+*Esempio Pratico:*
+Prometheus è il contabile che ogni 5 secondi scrive i numeri (Player online: 50, TPS: 19.5).
+Grafana è l'artista che prende quei numeri e disegna grafici bellissimi da mettere sul secondo monitor.
+
+- **Exporters**:
+  - *Concetto:* Piccoli programmi che leggono i dati (da Linux, da Minecraft, da MySQL) e li danno a Prometheus.
+
+<a name="modulo-lxxxvii"></a>
+### **87. Modulo LXXXVII: Centralized Logging (Loki/ELK)**
+*Esempio Pratico:*
+Hai 5 server (Lobby, Survival, BedWars...).
+Se devi cercare un errore, non puoi aprire 5 console diverse.
+Centralized Logging porta tutti i log in un unico posto. Cerchi "Error" e vedi tutto.
+
+<a name="modulo-lxxxviii"></a>
+### **88. Modulo LXXXVIII: Alerting Strategies & PagerDuty**
+*Esempio Pratico:*
+Non guardare i grafici tutto il giorno.
+Configura un Alert: "Se TPS < 15 per 5 minuti, mandami una notifica su Discord".
+Dormi sonni tranquilli finché il telefono non vibra.
+
+---
+
+## 🛡️ PARTE 8: DISASTER RECOVERY & LEGAL
+*Esempio Pratico:*
+Il datacenter prende fuoco (è successo davvero a OVH).
+Se non hai un piano, il tuo business è finito in cenere.
+Se hai un piano, ripristini i backup su un altro host e riapri in 2 ore.
+
+<a name="modulo-lxxxix"></a>
+### **89. Modulo LXXXIX: Backup Strategies: 3-2-1 Rule**
+*Esempio Pratico:*
+- **3** copie dei dati (Produzione, Backup Locale, Backup Remoto).
+- **2** supporti diversi (Disco del server, Cloud Storage).
+- **1** copia Offsite (in un'altra città/nazione).
+Se non segui questa regola, non hai un backup. Hai solo una speranza.
+
+<a name="modulo-xc"></a>
+### **90. Modulo XC: Disaster Recovery Plan (RTO & RPO)**
+*Esempio Pratico:*
+- **RTO (Recovery Time Objective):** Quanto tempo puoi stare offline? (Es. 4 ore).
+- **RPO (Recovery Point Objective):** Quanti dati puoi permetterti di perdere? (Es. 1 ora di gioco).
+Più sono bassi, più costa il sistema di backup.
+
+<a name="modulo-xci"></a>
+### **91. Modulo XCI: Legal Compliance: GDPR & Privacy**
+*Esempio Pratico:*
+Salvi gli IP dei player? Sono dati personali.
+Devi dire ai player come usi i loro dati.
+Se un player chiede di essere cancellato (Right to be Forgotten), devi saperlo fare.
+
+<a name="modulo-xcii"></a>
+### **92. Modulo XCII: Intellectual Property & DMCA**
+*Esempio Pratico:*
+Non usare texture pack protette da copyright senza permesso.
+Non vendere oggetti che violano l'EULA di Mojang.
+Proteggi il tuo marchio (Nome del server, Logo).
+
+---
+
+## 👾 PARTE 9: INTEGRAZIONE DISCORD & COMMUNITY APPS (NEW)
 *Esempio Pratico:*
 Il tuo server Minecraft è l'isola, ma Discord è il ponte che lo collega al mondo reale.
 Un server senza Discord è come un telefono senza rubrica: nessuno sa chi sei e nessuno può contattarti.
 
-<a name="modulo-lxxxi"></a>
-### **81. Modulo LXXXI: Discord Developer Portal: Applicazioni, Bot e Oauth2**
+<a name="modulo-xciii"></a>
+### **93. Modulo XCIII: Discord Developer Portal: Applicazioni, Bot e Oauth2**
 *Esempio Pratico:*
 Prima di costruire un robot, devi chiedere il permesso alla fabbrica.
 Il Developer Portal è la fabbrica dove registri il tuo bot e ottieni le chiavi (Token) per farlo funzionare.
 
-<a name="modulo-lxxxii"></a>
-### **82. Modulo LXXXII: JDA (Java Discord API): Creare Bot in Java**
+<a name="modulo-xciv"></a>
+### **94. Modulo XCIV: JDA (Java Discord API): Creare Bot in Java**
 *Esempio Pratico:*
 Hai imparato Java per i plugin? Ottimo, usa lo stesso linguaggio per il bot!
 JDA è la libreria che traduce "Java" in "Discord".
 
-<a name="modulo-lxxxiii"></a>
-### **83. Modulo LXXXIII: Webhooks & Interactions Bidirezionali: Minecraft to Discord**
+<a name="modulo-xcv"></a>
+### **95. Modulo XCV: Webhooks & Interactions Bidirezionali: Minecraft to Discord**
 *Esempio Pratico:*
 Un player trova un diamante. Il server manda un messaggio su Discord: "Tizio ha trovato diamanti!".
 Questo è un Webhook: un messaggero a senso unico velocissimo.
 
-<a name="modulo-lxxxiv"></a>
-### **84. Modulo LXXXIV: Slash Commands & Interactions: UX Moderna su Discord**
+<a name="modulo-xcvi"></a>
+### **96. Modulo XCVI: Slash Commands & Interactions: UX Moderna su Discord**
 *Esempio Pratico:*
 Invece di scrivere "!help" e sperare, scrivi "/" e Discord ti suggerisce i comandi.
 È come passare dal DOS a Windows: più facile, più bello, più professionale.
@@ -4626,6 +4753,45 @@ Risposta: "Un contadino ha perso l'anello nuziale nello stomaco di uno Slime gig
 ---
 
 
+<a name="modulo-xcvii"></a>
+### **97. Modulo XCVII: Reinforcement Learning: AI che impara giocando**
+
+*Esempio Pratico:*
+Hai mai visto un bambino imparare a camminare? Cade, si rialza, cade di nuovo. Ogni volta che non cade, il cervello gli dice "Bravo!" (Ricompensa).
+Il Reinforcement Learning (RL) è esattamente questo.
+Un Bot PvP non viene programmato con "Se vedi nemico, colpisci". Viene programmato con "Se vinci, prendi +1 punto. Se muori, prendi -1 punto". Dopo 1 milione di partite, diventa imbattibile.
+
+- **Agent & Environment**:
+  - *Concetto:* L'Agente (Bot) agisce nell'Ambiente (Server Minecraft).
+  - *Zero-Based:* Il Bot è il giocatore, il Server è il campo da gioco.
+- **Reward Function**:
+  - *Concetto:* La "carota e il bastone". Definisce cosa è bene e cosa è male.
+  - *Uso:* Uccidere un player = +10. Morire = -10. Camminare contro un muro = -1.
+
+#### 📚 [DIZIONARIO TECNICO]
+> **Reinforcement Learning (RL):** Un paradigma di Machine Learning dove un agente impara a prendere decisioni ottimali interagendo con un ambiente per massimizzare una ricompensa cumulativa.
+>
+> **Q-Learning:** Un algoritmo classico di RL che impara il valore di ogni azione in ogni stato possibile.
+>
+> **Exploration vs Exploitation:** Il dilemma dell'agente: Provare una mossa nuova che potrebbe essere disastrosa (Exploration) o fare quello che sa già funzionare bene (Exploitation)?
+
+#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
+**Deep Q-Networks (DQN).**
+- Invece di una tabella gigante con tutte le mosse possibili (impossibile in Minecraft, troppe combinazioni), usiamo una Rete Neurale per stimare il valore delle azioni.
+- **Experience Replay:** L'agente salva le sue partite passate in una memoria e le ripassa durante l'allenamento per non dimenticare le lezioni vecchie.
+- **Target Network:** Una copia della rete che cambia lentamente, per stabilizzare l'apprendimento ed evitare che l'agente "insegua la propria coda".
+
+#### 🌍 [REAL-WORLD APPLICATION]
+**Scenario:** Economy Balancing Bot.
+Un server ha un'economia instabile. I prezzi oscillano troppo.
+Invece di un Admin che cambia i prezzi a mano, metti un'AI RL.
+- **Obiettivo (Reward):** Mantenere l'inflazione al 2% annuo e garantire che tutti i materiali siano venduti.
+- **Azioni:** Alzare o abbassare i prezzi dello Shop di +/- 1%.
+- **Risultato:** L'AI impara che quando c'è troppo ferro in giro, deve abbassare il prezzo di acquisto per scoraggiare il farming eccessivo, stabilizzando l'economia automaticamente.
+
+---
+
+
 <a name="modulo-xcviii"></a>
 ### **98. Modulo XCVIII: AI-Powered Anti-Cheat: Comportamento vs Firme**
 
@@ -4856,7 +5022,9 @@ Il server viene bucato da un hacker. Se scappi e chiudi Discord, è la fine. Se 
 >
 > **Root Cause Analysis (RCA):** L'arte di trovare la causa radice di un problema, non solo il sintomo.
 >
-> **Status Page:** Una pagina web (tipo status.discord.com) che dice se il server è online o offline, indipendente dal server stesso.
+> **Status Page (Uptime Kuma):** Non hostarla sullo stesso server di gioco! Se il server cade, cade anche la pagina che dice "Il server è caduto".
+> *Consiglio:* Usa un VPS separato da 2€ o servizi gratuiti come *UptimeRobot*.
+> *Link:* [status.tuoserver.com](http://status.tuoserver.com) deve essere sempre raggiungibile.
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **Incident Management & The 5 Whys.**
@@ -4971,8 +5139,75 @@ Guadagni 1000€ e li spendi in plugin. Il mese dopo ne guadagni 100€ e non pu
 > **CAPEX (Capital Expenditure):** Spese una tantum per beni a lungo termine (es. comprare un server fisico da tenere in casa, pagare un developer per un plugin custom).
 >
 > **OPEX (Operating Expenditure):** Spese ricorrenti per far funzionare il business (es. affitto VPS mensile, dominio, stipendi staff).
+
+#### 🌍 [REAL-WORLD APPLICATION]
+**Scenario:** Comprare server dedicato da 128GB RAM (200€/mese) per un server con 10 player.
+Errore: Sovradimensionamento (Overprovisioning). Stai buttando soldi.
+Soluzione: Inizia con un VPS da 10€ (16GB). Quando i player pagano e riempiono il server, usi quei soldi per fare upgrade.
+Bootstrap (Partire da zero con le proprie risorse) è la via.
+
+---
+
+<a name="modulo-cvii"></a>
+### **107. Modulo CVII: Monetizzazione Etica e EULA Compliance**
+
+*Esempio Pratico:*
+Vendere "Unban" è illegale e immorale. È un ricatto.
+Vendere "Spada OP che uccide tutti" è Pay-to-Win (P2W). Rovina il gioco e viola l'EULA.
+Vendere "Cappello cosmetico carino" è etico. I player lo comprano perché amano il server.
+
+- **Minecraft EULA (End User License Agreement)**:
+  - *Concetto:* Le regole di Mojang.
+  - *Regola d'oro:* Non puoi vendere nulla che dia un vantaggio competitivo nel gameplay. Solo cosmetici.
+
+- **Pay-to-Win vs Free-to-Play**:
+  - *Concetto:* P2W fa soldi veloci ma muore presto (i player odiano perdere contro chi paga).
+  - *Zero-Based:* Cosmetici e Booster (vantaggi per tutti) durano anni.
+
+#### 📚 [DIZIONARIO TECNICO]
+> **EULA (End User License Agreement):** Il contratto legale tra te e Mojang. Se lo violi, possono mettere il tuo server in Blacklist (nessuno può più entrare).
 >
-> **ROI (Return on Investment):** Quanto guadagni per ogni euro speso. (Guadagno - Costo) / Costo. Se spendi 100€ in ads e ne incassi 150€, il ROI è 50%.
+> **Cosmetics:** Oggetti puramente estetici (Particle, Pet, Cappelli, Colori chat).
+>
+> **Booster:** Un vantaggio temporaneo che si applica a *tutti* i giocatori (es. Global XP Boost). Mojang lo permette perché rende felici tutti, non solo chi paga.
+
+#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
+**The Psychology of Microtransactions.**
+- **Scarcity:** "Offerta limitata, solo per 24 ore!". Crea urgenza.
+- **Social Proof:** "Tutti hanno le ali di drago". Se le vedo agli altri, le voglio anche io.
+- **Reciprocity:** Se offri un server bellissimo gratis, i player si sentono in dovere di "sdebitarsi" comprando qualcosa.
+
+**Game Economy Design: The Battle Pass.**
+- Il Battle Pass è il sistema di monetizzazione definitivo perché unisce Retention e Revenue.
+- **Retention:** Per sbloccare i livelli devi giocare ogni giorno (Daily Quests).
+- **Revenue:** Paghi per sbloccare la fascia "Premium" delle ricompense.
+- **Etica:** Le ricompense sono cosmetiche o "Quality of Life" (es. chat colorata), non vantaggi ingiusti.
+- **FOMO (Fear Of Missing Out):** "Se non finisco il pass entro fine mese, perdo la skin esclusiva". Spinge a giocare di più.
+
+#### 🌍 [REAL-WORLD APPLICATION]
+**Scenario:** Server Fazioni P2W vs Server Etico.
+P2W: Vende kit protezione 4 a 50€.
+- Mese 1: Guadagna 5000€.
+- Mese 2: I player free vengono uccisi, si stufano e se ne vanno. Il server muore.
+Etico: Vende Skin, Pet e Battle Pass.
+- Mese 1: Guadagna 500€.
+- Mese 12: Guadagna 2000€ (perché i player sono aumentati e fidelizzati).
+- Mese 24: Guadagna 10.000€.
+La sostenibilità vince sempre sul lungo termine.
+
+---
+
+
+
+<a name="modulo-cviii"></a>
+### **108. Modulo CVIII: Business Plan e ROI: La Matematica del Successo**
+
+*Esempio Pratico:*
+Aprire un server costa. Se spendi 100€ al mese e ne guadagni 50€, stai pagando per lavorare.
+Il ROI (Return on Investment) è la bussola. Se investi 1€ in pubblicità, devono tornartene almeno 1.50€. Altrimenti ferma tutto.
+
+- **ROI (Return on Investment)**:
+  - *Concetto:* Quanto guadagni per ogni euro speso. (Guadagno - Costo) / Costo. Se spendi 100€ in ads e ne incassi 150€, il ROI è 50%.
 
 #### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
 **Unit Economics.**
@@ -4993,43 +5228,8 @@ Guadagni 1000€ e li spendi in plugin. Il mese dopo ne guadagni 100€ e non pu
 ---
 
 
-<a name="modulo-cvii"></a>
-### **107. Modulo CVII: Monetizzazione Etica e EULA Master**
-
-*Esempio Pratico:*
-Vendere spade "OP" (Pay-to-Win) fa soldi subito ma uccide il server dopo un mese (i poveri se ne vanno, i ricchi si annoiano). Vendere cappelli belli (Cosmetici) fa soldi per sempre.
-
-- **EULA**:
-  - *Zero-Based:* Le regole di Mojang. Non vendere vantaggi nel PvP.
-- **LTV (Lifetime Value)**:
-  - *Concetto:* È meglio un player che spende 5€ al mese per 2 anni, che uno che spende 50€ una volta e poi se ne va.
-
-#### 📚 [DIZIONARIO TECNICO]
-> **Pay-to-Win (P2W):** Modello di business dove pagando ottieni vantaggi competitivi (spade più forti, fly in pvp). Vietato dall'EULA di Mojang e odiato dai giocatori.
->
-> **Freemium:** Il gioco è gratis, ma puoi pagare per contenuti extra (skin, pet, accessi anticipati).
->
-> **Whale (Balena):** Un giocatore che spende enormi quantità di denaro (migliaia di euro). Spesso il 50% del fatturato viene dall'1% dei player (le Balene).
-
-#### ⚙️ [ENCICLOPEDIA INGEGNERISTICA]
-**Game Economy Design: The Battle Pass.**
-- Il Battle Pass è il sistema di monetizzazione definitivo perché unisce Retention e Revenue.
-- **Retention:** Per sbloccare i livelli devi giocare ogni giorno (Daily Quests).
-- **Revenue:** Paghi per sbloccare la fascia "Premium" delle ricompense.
-- **Etica:** Le ricompense sono cosmetiche o "Quality of Life" (es. chat colorata), non vantaggi ingiusti.
-- **FOMO (Fear Of Missing Out):** "Se non finisco il pass entro fine mese, perdo la skin esclusiva". Spinge a giocare di più.
-
-#### 🌍 [REAL-WORLD APPLICATION]
-**Scenario:** Hypixel vs Server P2W.
-- Server P2W: Vende rank "God" a 100€. Guadagna tanto subito. Mojang lo banna dopo 3 mesi. Player arrabbiati.
-- Hypixel: Vende rank "MVP+" (solo cosmetico) e Loot Box. Rispetta l'EULA. Esiste da 10 anni. Fattura milioni.
-- Lezione: La sostenibilità batte il guadagno rapido.
-
----
-
-
-<a name="modulo-cviii"></a>
-### **108. Modulo CVIII: Marketing, Branding e Community Growth**
+<a name="modulo-cix"></a>
+### **109. Modulo CIX: Marketing, Branding e Community Growth**
 
 *Esempio Pratico:*
 Il marketing non è spammare IP sugli altri server. È fare un TikTok divertente che fa dire alla gente "Voglio giocarci!".
@@ -5064,8 +5264,8 @@ Il marketing non è spammare IP sugli altri server. È fare un TikTok divertente
 ---
 
 
-<a name="modulo-cix"></a>
-### **109. Modulo CIX: Career Path: Dal Server al Mondo Professionale**
+<a name="modulo-cx"></a>
+### **110. Modulo CX: Career Path: Dal Server al Mondo Professionale**
 
 *Esempio Pratico:*
 Gestire un server non è un gioco. Stai facendo il SysAdmin, il Manager, il Contabile e il Programmatore. Le aziende cercano disperatamente queste skill.
@@ -5097,8 +5297,8 @@ Gestire un server non è un gioco. Stai facendo il SysAdmin, il Manager, il Cont
 ---
 
 
-<a name="modulo-cx"></a>
-### **110. Modulo CX: Personal Branding e Networking su LinkedIn/GitHub**
+<a name="modulo-cxi"></a>
+### **111. Modulo CXI: Personal Branding e Networking su LinkedIn/GitHub**
 
 *Esempio Pratico:*
 Su LinkedIn non scrivere "Ho un server". Scrivi "Fondatore di una piattaforma di gaming con 500 utenti attivi e gestione team remoto".
@@ -5135,8 +5335,8 @@ Su LinkedIn non scrivere "Ho un server". Scrivi "Fondatore di una piattaforma di
 ---
 
 
-<a name="modulo-cxi"></a>
-### **111. Modulo CXI: Kaizen Mindset e Growth Mindset**
+<a name="modulo-cxii"></a>
+### **112. Modulo CXII: Kaizen Mindset e Growth Mindset**
 *Esempio Pratico:*
 Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorno. Dopo un anno sarai un gigante.
 
@@ -5145,46 +5345,46 @@ Non cercare di fare il server perfetto oggi. Cerca di migliorare l'1% ogni giorn
 - **Growth Mindset**:
   - *Zero-Based:* L'errore non è un fallimento, è un dato. "Ho imparato che questo plugin non funziona", non "Sono un idiota".
 
-
-<a name="modulo-cviii"></a>
-
 ---
 
 ## 🚀 PARTE 9: ADVANCED DEVOPS & INFRASTRUCTURE AS CODE (NEW)
+
+
+
 *Esempio Pratico:*
 Quando hai 1 server, lo gestisci a mano.
 Quando ne hai 100, se li gestisci a mano impazzisci.
 DevOps è l'arte di gestire 1000 server come se fossero uno solo, scrivendo codice invece di cliccare bottoni.
 
-<a name="modulo-cxii"></a>
-### **112. Modulo CXII: Terraform: Infrastructure as Code**
+<a name="modulo-cxiii"></a>
+### **113. Modulo CXIII: Terraform: Infrastructure as Code**
 *Esempio Pratico:*
 Invece di comprare un server, installare Linux, aprire le porte...
 Scrivi un file di testo: "Voglio 3 server con Linux e porta 25565 aperta".
 Terraform legge il file e crea tutto in 3 minuti. Magia.
 
-<a name="modulo-cxiii"></a>
-### **113. Modulo CXIII: Docker & Kubernetes: Container Orchestration**
+<a name="modulo-cxiv"></a>
+### **114. Modulo CXIV: Docker & Kubernetes: Container Orchestration**
 *Esempio Pratico:*
 Docker è come un container navale: ci metti dentro il tuo server Minecraft e lo puoi spedire ovunque (AWS, Google, PC di casa) senza cambiare nulla.
 Kubernetes è la gru del porto che sposta i container dove servono automaticamente.
 
-<a name="modulo-cxiv"></a>
-### **114. Modulo CXIV: Prometheus & Grafana: Monitoring Stack**
+<a name="modulo-cxv"></a>
+### **115. Modulo CXV: Prometheus & Grafana: Monitoring Stack**
 *Esempio Pratico:*
 Il cruscotto della tua auto ti dice velocità e benzina.
 Grafana è il cruscotto del tuo network: CPU, RAM, Player Online, TPS. Tutto in tempo reale, bellissimo da vedere.
 
-<a name="modulo-cxv"></a>
-### **115. Modulo CXV: CI/CD Pipelines (GitHub Actions)**
+<a name="modulo-cxvi"></a>
+### **116. Modulo CXVI: CI/CD Pipelines (GitHub Actions)**
 *Esempio Pratico:*
 Modifichi il codice del plugin.
 Invece di compilare, scaricare, caricare con FTP, riavviare...
 Fai "git push".
 GitHub Actions fa tutto il resto: compila, testa, carica e riavvia. Tu vai a prendere il caffè.
 
-<a name="modulo-cxvi"></a>
-### **116. Modulo CXVI: Scaling Strategies: Horizontal vs Vertical Scaling Patterns**
+<a name="modulo-cxvii"></a>
+### **117. Modulo CXVII: Scaling Strategies: Horizontal vs Vertical Scaling Patterns**
 *Esempio Pratico:*
 Hai troppi player.
 - **Vertical Scaling:** Compri un server più potente (CPU più veloce). Costa tanto, ha un limite fisico.
@@ -5193,7 +5393,7 @@ Hai troppi player.
 ---
 
 <a name="appendice-risorse"></a>
-### **117. Appendice: Biblioteca dell'Ingegnere (Risorse Consigliate)**
+### **118. Appendice: Biblioteca dell'Ingegnere (Risorse Consigliate)**
 *Libri Fondamentali:*
 - ["Clean Code" di Robert C. Martin](https://www.amazon.it/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) - *Il testo sacro sulla qualità del codice.*
 - ["The Linux Command Line" di William Shotts](https://linuxcommand.org/tlcl.php) - *La bibbia per padroneggiare la shell (Disponibile gratis in PDF).*

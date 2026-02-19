@@ -1,0 +1,19 @@
+# Configurazione Paper Global - Fracture Network
+# Versione 1.20.x - 1.21.x
+
+proxies:
+  velocity:
+    enabled: true
+    online-mode: false
+    secret: "FractureNet_Sec_7xR9p2L5qW8" # Secret dal Proxy Velocity
+  bungee-cord:
+    enabled: false
+
+messages:
+  no-permission: "§cNon hai il permesso di farlo!"
+  kick:
+    connection-throttle: "§cConnessioni troppo veloci! Riprova tra poco."
+    authentication-servers-down: "§cI server di autenticazione sono offline."
+
+timings:
+  enabled: false # Risparmiamo risorse

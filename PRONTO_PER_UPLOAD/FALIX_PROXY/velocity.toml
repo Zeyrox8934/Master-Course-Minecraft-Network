@@ -1,0 +1,26 @@
+# Configurazione Velocity per Fracture Network
+# Ottimizzato per FalixNodes (4GB RAM)
+
+config-version = "2.7"
+
+bind = "0.0.0.0:27055"
+motd = "<aqua><bold>Fracture Network <gray>- <white>Server Network<br><yellow>Versione 1.21.x"
+show-max-players = 1000
+online-mode = false
+force-key-authentication = false
+player-info-forwarding-mode = "modern"
+forwarding-secret-file = "forwarding.secret"
+
+[servers]
+lobby = "node-fi-free-03.tickhosting.com:42213"
+
+[forced-hosts]
+
+[query]
+enabled = false
+
+[advanced]
+bungee-plugin-message-channel-enabled = true
+
+[metrics]
+enabled = false

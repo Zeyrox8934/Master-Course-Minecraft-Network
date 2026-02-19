@@ -1,0 +1,25 @@
+# Configurazione Geyser per Fracture Network
+# Ottimizzato per Velocity
+
+bedrock:
+  address: 0.0.0.0
+  port: 27055
+  motd1: "§b§lFracture Network"
+  motd2: "§eBedrock Edition"
+
+remote:
+  address: 127.0.0.1
+  port: 27055
+  auth-type: floodgate
+
+floodgate-key-file: ../floodgate/key.pem
+
+passthrough-motd: true
+passthrough-player-counts: true
+
+# Ottimizzazione per 1.20.x - 1.21.x
+allow-inventory-caching: true
+# Importante per server Cracked
+auth-type: floodgate
+# Se il server è offline mode, Geyser deve sapere come gestire i nomi
+# Floodgate gestisce l'autenticazione per noi.

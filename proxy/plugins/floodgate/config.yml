@@ -1,0 +1,8 @@
+# Configurazione Floodgate per Velocity
+# Permette ai giocatori Bedrock di entrare senza account Java
+
+key-file: "key.pem"
+send-floodgate-data: true
+encryption:
+  enabled: true
+# Il resto delle impostazioni può rimanere di default per ora

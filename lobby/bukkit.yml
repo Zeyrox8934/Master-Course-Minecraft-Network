@@ -1,0 +1,27 @@
+# Ottimizzazione Bukkit - Fracture Network
+settings:
+  allow-end: false
+  warn-on-overload: true
+  permissions-file: permissions.yml
+  update-folder: update
+  plugin-profiling: false
+  connection-throttle: -1
+  query-plugins: false
+  deprecated-verbose: default
+  shutdown-message: "§cIl server si sta riavviando..."
+  minimum-api: none
+spawn-limits:
+  monsters: 15
+  animals: 5
+  water-animals: 2
+  water-ambient: 2
+  water-underground-creature: 2
+  axolotls: 2
+  ambient: 1
+chunk-gc:
+  period-in-ticks: 400
+ticks-per:
+  animal-spawns: 400
+  monster-spawns: 10
+  autosave: 6000
+aliases: noworldalias

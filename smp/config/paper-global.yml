@@ -1,0 +1,12 @@
+# Configurazione Paper Global - SMP
+proxies:
+  velocity:
+    enabled: true
+    online-mode: false
+    secret: "FractureNet_Sec_7xR9p2L5qW8"
+  bungee-cord:
+    enabled: false
+messages:
+  no-permission: "§cNon hai il permesso di farlo!"
+timings:
+  enabled: false

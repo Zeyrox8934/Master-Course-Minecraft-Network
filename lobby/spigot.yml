@@ -1,0 +1,26 @@
+# Ottimizzazione Spigot - Fracture Network
+settings:
+  save-user-cache-on-stop-only: true
+  sample-count: 12
+  bungeecord: false # Usiamo Velocity Modern, quindi questo resta false
+  user-cache-size: 1000
+  player-shuffle: 0
+world-settings:
+  default:
+    verbose: false
+    mob-spawn-range: 4
+    entity-activation-range:
+      animals: 16
+      monsters: 24
+      raiders: 48
+      misc: 8
+    tick-inactive-villagers: false
+    entity-tracking-range:
+      players: 48
+      animals: 48
+      monsters: 48
+      misc: 32
+    merge-radius:
+      item: 4.0
+      exp: 6.0
+    nerf-spawner-mobs: true
