@@ -1,6 +1,0 @@
-# Configurazione BungeeGuard per la Lobby
-allowed-tokens:
-  - "FractureNet_Sec_7xR9p2L5qW8"
-messages:
-  no-data-provided: "&cAccesso negato. Entra dal Proxy!"
-  invalid-token-provided: "&cAccesso negato. Token di sicurezza non valido."
