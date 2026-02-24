@@ -1,6 +1,0 @@
-allowed-proxies:
-  - "FractureNet_Sec_7xR9p2L5qW8"
-
-messages:
-  no-data: "§c[Fracture Security] Accesso negato. Devi passare dal Proxy!"
-  invalid-token: "§c[Fracture Security] Token non valido!"
