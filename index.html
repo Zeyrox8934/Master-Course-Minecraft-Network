@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRATTATO UNIVERSALE DI INGEGNERIA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code&display=swap"
+        rel="stylesheet">
+    <style>
+        /* === TEMA E VARIABILI === */
+        :root {
+            --bg-dark: #050505;
+            --bg-surface: #111111;
+            --bg-card: #161616;
+            --bg-border: #222222;
+            --text-main: #f5f5f5;
+            --text-muted: #999999;
+
+            --neon-green: #00ff55;
+            --neon-blue: #0077ff;
+            --neon-purple: #9d00ff;
+            --error-red: #ff3333;
+            --success-green: #00ff55;
+
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        /* === RESET E IMPOSTAZIONI BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === PARTICELLE DI SFONDO === */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* === STRUTTURA LAYOUT === */
+        #app {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sidebar - Menu di Navigazione */
+        #sidebar {
+            width: 300px;
+            background-color: rgba(17, 17, 17, 0.85);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--bg-border);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            color: var(--text-main);
+        }
+
+        .brand span {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 119, 255, 0.4);
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Colori per i percorsi */
+        .nav-item[data-target="path-minecraft"].active {
+            border-left-color: var(--neon-green);
+        }
+
+        .nav-item[data-target="path-devops"].active {
+            border-left-color: var(--neon-blue);
+        }
+
+        .nav-item[data-target="path-software"].active {
+            border-left-color: var(--neon-purple);
+        }
+
+        .nav-item[data-target="appendix"].active {
+            border-left-color: var(--text-main);
+        }
+
+        /* Contenuto Principale */
+        #content {
+            margin-left: 300px;
+            flex: 1;
+            padding: 4rem 5%;
+            max-width: 1400px;
+        }
+
+        /* === SEZIONI === */
+        .section-view {
+            display: none;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header di Sezione */
+        .page-header {
+            margin-bottom: 4rem;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 800px;
+        }
+
+        /* === COMPONENTI === */
+        /* Griglia Percorsi (Home) */
+        .path-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .path-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--bg-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .path-card:hover {
+            transform: translateY(-5px);
+            background-color: #1a1a1a;
+        }
+
+        .path-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .path-card.minecraft::before {
+            background-color: var(--neon-green);
+        }
+
+        .path-card.devops::before {
+            background-color: var(--neon-blue);
+        }
+
+        .path-card.software::before {
+            background-color: var(--neon-purple);
+        }
+
+        .path-card.appendix::before {
+            background-color: var(--text-main);
+        }
+
+        .path-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+        }
+
+        .path-icon {
+            font-size: 2.5rem;
+        }
+
+        /* Struttura Modulo */
+        .module-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--bg-border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .module-title {
+            font-size: 2rem;
+            border-bottom: 1px solid var(--bg-border);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Sezioni interne al modulo */
+        .sub-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .sub-section h4 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sub-section p,
+        .sub-section ul {
+            font-size: 1.05rem;
+            color: #d0d0d0;
+            margin-bottom: 1rem;
+            list-style-position: inside;
+        }
+
+        /* Box "Basics" Propedeutico */
+        .basics-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--neon-blue);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .basics-box strong {
+            color: var(--neon-blue);
+        }
+
+        /* Dizionario Emoji */
+        .dictionary-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .dict-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--bg-border);
+        }
+
+        /* SVG Container */
+        .svg-container {
+            background: #000;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--bg-border);
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Laboratorio / Quiz */
+        .lab-box {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px dashed var(--bg-border);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 3rem;
+        }
+
+        .quiz-question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--bg-border);
+            color: var(--text-main);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+        }
+
+        .quiz-option:hover {
+            background: #222;
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 85, 0.1);
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--error-red);
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        .quiz-feedback {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .feedback-correct {
+            background: rgba(0, 255, 85, 0.1);
+            color: var(--success-green);
+            border-left: 3px solid var(--success-green);
+        }
+
+        .feedback-wrong {
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--error-red);
+            border-left: 3px solid var(--error-red);
+        }
+
+        /* Typography per evidenziazioni */
+        .hl-green {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 85, 0.3);
+        }
+
+        .hl-blue {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 119, 255, 0.3);
+        }
+
+        .hl-purple {
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(157, 0, 255, 0.3);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            color: var(--neon-green);
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* Media Queries per Responsiveness */
+        @media (max-width: 900px) {
+            #app {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--bg-border);
+                padding: 1rem;
+            }
+
+            #content {
+                margin-left: 0;
+                padding: 2rem 5%;
+            }
+
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .module-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sfondo Canvas -->
+    <canvas id="canvas-bg"></canvas>
+
+    <!-- App Container -->
+    <div id="app">
+        <!-- Barra di Navigazione Laterale -->
+        <nav id="sidebar">
+            <div class="brand"><span>T.</span>U.I.</div>
+
+            <ul class="nav-list">
+                <li><a class="nav-item active" data-target="home">🏠 Hub Principale</a></li>
+
+                <div class="nav-section-title">I Percorsi</div>
+                <li><a class="nav-item" data-target="path-minecraft">🟩 Minecraft Architect</a></li>
+                <li><a class="nav-item" data-target="path-devops">🟦 Enterprise Cloud & DevOps</a></li>
+                <li><a class="nav-item" data-target="path-software">🟪 Software Engineering</a></li>
+
+                <div class="nav-section-title">Risorse Aggiuntive</div>
+                <li><a class="nav-item" data-target="appendix">📚 Appendice & Glossario</a></li>
+            </ul>
+        </nav>
+
+        <!-- Contenitore Viste -->
+        <main id="content">
+
+            <!-- VISTA: HOME -->
+            <section id="home" class="section-view active">
+                <header class="page-header">
+                    <h1>TRATTATO UNIVERSALE<br>DI <span class="hl-blue">INGEGNERIA</span></h1>
+                    <p>Formazione elitaria. Dai fondamenti fisici dei processori all'architettura software di network
+                        scalabili. Scegli il percorso e inizia l'evoluzione.</p>
+                </header>
+
+                <div class="path-grid">
+                    <div class="path-card minecraft" onclick="SPA.navigate('path-minecraft')">
+                        <div class="path-icon">🟩</div>
+                        <h3>Minecraft Architect</h3>
+                        <p>Ingegneria dei server di gioco. Allocazione risorse, Tick Rate, mitigazione Lag e gestione HR
+                            del personale.</p>
+                    </div>
+                    <div class="path-card devops" onclick="SPA.navigate('path-devops')">
+                        <div class="path-icon">🟦</div>
+                        <h3>Enterprise Cloud</h3>
+                        <p>Amministrazione di sistema Linux, sicurezza perimetrale (DDoS), containerizzazione e gestione
+                            reti.</p>
+                    </div>
+                    <div class="path-card software" onclick="SPA.navigate('path-software')">
+                        <div class="path-icon">🟪</div>
+                        <h3>Software Engineering</h3>
+                        <p>Progettazione basi di dati SQL, architettura del codice, algoritmi logaritmici e
+                            programmazione orientata agli oggetti.</p>
+                    </div>
+                    <div class="path-card appendix" onclick="SPA.navigate('appendix')">
+                        <div class="path-icon">📚</div>
+                        <h3>Appendice Integrale</h3>
+                        <p>Glossario globale, regole d'oro, certificazioni richieste sul mercato e roadmap di
+                            apprendimento.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA: PATH MINECRAFT -->
+            <section id="path-minecraft" class="section-view">
+                <header class="page-header">
+                    <h1>Path: <span class="hl-green">Minecraft Architect</span></h1>
+                    <p>Dominio dell'hardware, ottimizzazione del protocollo di rete e gestione del personale.</p>
+                </header>
+                <div id="render-minecraft"></div>
+            </section>
+
+            <!-- VISTA: PATH DEVOPS -->
+            <section id="path-devops" class="section-view">
+                <header class="page-header">
+                    <h1>Path: <span class="hl-blue">Enterprise Cloud & DevOps</span></h1>
+                    <p>Il cuore operativo. Linux, sicurezza e scalabilità orizzontale.</p>
+                </header>
+                <div id="render-devops"></div>
+            </section>
+
+            <!-- VISTA: PATH SOFTWARE -->
+            <section id="path-software" class="section-view">
+                <header class="page-header">
+                    <h1>Path: <span class="hl-purple">Software Engineering</span></h1>
+                    <p>Sviluppo. Logica formale, strutture dati veloci e database relazionali.</p>
+                </header>
+                <div id="render-software"></div>
+            </section>
+
+            <!-- VISTA: APPENDICE -->
+            <section id="appendix" class="section-view">
+                <header class="page-header">
+                    <h1>Appendice e Glossario</h1>
+                </header>
+                <div id="render-appendix"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- === JAVASCRIPT & DATABASE === -->
+    <script>
+        /**
+         * DATABASE INTERNO DEI MODULI (JSON)
+         * Struttura rigorosa: Analogia, Ingegneria, Dizionario, Esercizio, SVG (Opzionale), Basics (Opzionale).
+         * Zero Gerundio garantito.
+         */
+        const TUI_DB = {
+            "path-minecraft": [
+                {
+                    id: "mod-hw-001",
+                    title: "Hardware Fondamentale e Architettura CPU",
+                    basics: "IL CICLO DI CLOCK (Frequenza): I processori non operano in continuo, ma a scatti regolari misurati in Hertz (Hz). 1 Hertz equivale a un'operazione per secondo. Un processore moderno a 5.0 GHz compie 5 miliardi di operazioni elementari ogni singolo secondo. Questa velocità dettata dal quarzo interno determina il ritmo vitale di ogni software.",
+                    analogia: "Immagina la scheda madre come una città collegata da autostrade. La CPU è la fabbrica centrale. La RAM è il magazzino locale. Il disco (SSD) è l'archivio remoto. Se la fabbrica produce oggetti a velocità estrema, ma i camion sul nastro trasportatore (Bus di Sistema) o i lavoratori nel magazzino sono lenti, l'intera catena di fornitura si ferma in attesa. Questo definisce il concetto di 'Collo di Bottiglia'.",
+                    ingegneria: "L'architettura x86_64 domina l'ecosistema server. Nell'allocazione risorse per processi Single-Threaded come il Server di gioco, la paralellizzazione massiva (multi-core) risulta inefficace. Risulta matematicamente superiore favorire l'IPC (Instructions Per Cycle) elevato e frequenze di picco. L'uso di L3 Cache espansa (es. architettura 3D V-Cache) riduce drasticamente l'accesso alla memoria DRAM, abbattendo la latenza CAS nei cicli di Fetch delle istruzioni.",
+                    dizionario: [
+                        { emoji: "⚡", term: "Frequenza Base", desc: "La velocità garantita dalla CPU senza surriscaldamento." },
+                        { emoji: "🔥", term: "Thermal Throttling", desc: "La riduzione automatica delle frequenze attivata quando il silicio supera i parametri di sicurezza termica." },
+                        { emoji: "⏱️", term: "TPS (Ticks Per Second)", desc: "Unità di misura della fluidità logica. L'ecosistema richiede 20 cicli al secondo costanti." }
+                    ],
+                    svg: `<svg viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="10" width="100" height="130" fill="#111" stroke="#00ff55" stroke-width="2" rx="5"/>
+                            <text x="35" y="30" fill="#00ff55" font-family="Fira Code" font-size="12">RAM</text>
+                            
+                            <line x1="110" y1="75" x2="240" y2="75" stroke="#fff" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="135" y="65" fill="#fff" font-family="Inter" font-size="10">Latenza Alta</text>
+
+                            <rect x="240" y="10" width="150" height="130" fill="#111" stroke="#0077ff" stroke-width="2" rx="5"/>
+                            <text x="295" y="30" fill="#0077ff" font-family="Fira Code" font-size="12">CPU</text>
+                            <rect x="250" y="45" width="130" height="30" fill="#222" stroke="#9d00ff"/>
+                            <text x="270" y="65" fill="#9d00ff" font-family="Inter" font-size="10">L1/L2 CACHE</text>
+                            <rect x="250" y="90" width="130" height="40" fill="#222" stroke="#ff3333"/>
+                            <text x="285" y="115" fill="#ff3333" font-family="Inter" font-size="12">ALU</text>
+                          </svg>`,
+                    quiz: {
+                        question: "Quale fattore previene il crollo del Tick Rate sotto carichi computazionali massivi per un processo single-core?",
+                        options: [
+                            "Installare memoria RAM DDR4 invece della precedente al fine di ospitare file più capienti.",
+                            "Acquistare processori Enterprise dotati di 128 Core a basso consumo elettrico.",
+                            "Selezionare CPU focalizzate su frequenze elevate ed IPC superiore, affiancate da una dissipazione termica aggressiva."
+                        ],
+                        correctIndex: 2,
+                        explanation: "Risposta esatta. L'elevato IPC (Instructions Per Cycle) e le alte frequenze permettono al singolo thread critico di eseguire le operazioni matematiche prima della scadenza del tick (50ms). Il multi-threading non scala in questa architettura seriale."
+                    }
+                },
+                {
+                    id: "mod-hr-001",
+                    title: "Gestione Personale (HR) e Regolamentazioni Aziendali",
+                    analogia: "Assegnare permessi in base alla fiducia è come dare le chiavi della cassaforte bancaria al figlio dell'impiegato solo perché risulta amichevole. Le autorizzazioni digitali non interpretano l'amicizia; riconoscono solo ordini formali. L'amministrazione esige procedure rigide, non decisioni emotive basate su rapporti interpersonali momentanei.",
+                    ingegneria: "L'ingegneria sociale (HR Management) nei sistemi digitali si basa sul Modello RBAC (Role-Based Access Control) combinato al Principio del Minimo Privilegio (PoLP). Il profilo assegnato all'operatore di primo livello (Tier 1 Support) include esclusivamente autorizzazioni di lettura ('Read-Only') e mutazione limitata. L'abilitazione di permessi di cancellazione o alterazione globale ai nodi inferiori compromette l'architettura Zero-Trust.",
+                    dizionario: [
+                        { emoji: "🛡️", term: "PoLP (Minimo Privilegio)", desc: "Assegnazione matematica del solo set ristretto di permessi per completare un'azione definita." },
+                        { emoji: "📜", term: "SOP (Procedure Standard)", desc: "Documentazione vincolante per l'operato umano. Annulla l'interpretazione personale delle normative." },
+                        { emoji: "👁️", term: "Audit Logging", desc: "Il sistema immutabile che traccia in formato testuale l'esatta esecuzione di ogni direttiva inviata dallo staff." }
+                    ],
+                    quiz: {
+                        question: "Quale procedura ingegneristica annulla le controversie interne causate dall'abuso di poteri?",
+                        options: [
+                            "Implementare un sistema di Audit Log centralizzato che archivia permanentemente l'esecutore, l'ora e l'esatto comando inserito.",
+                            "Vietare allo staff di interagire col pubblico.",
+                            "Sostituire frequentemente i membri per mantenere il potere isolato."
+                        ],
+                        correctIndex: 0,
+                        explanation: "Positivo. I fatti matematici non ammettono divergenze narrative. Il Log espone la cruda verità delle azioni di sistema tramite timestamp assoluti."
+                    }
+                },
+                {
+                    id: "mod-hw-009",
+                    title: "Teoria della Computazione e Algoritmi (Big O Notation)",
+                    analogia: "Cercare un oggetto specifico in un baule disordinato di Minecraft richiede, nel caso peggiore, l'ispezione di ogni singolo slot. Se il baule contiene mille miliardi di oggetti, l'ispezione sequenziale paralizza chi la esegue. Un algoritmo efficiente struttura e ordina i dati a monte (es. alfabeticamente), consentendo una ricerca logaritmica rapida che ignora intere metà del baule per ogni interrogazione fallita, riducendo esponenzialmente lo sforzo computazionale.",
+                    basics: "COMPLESSITÀ SPAZIO-TEMPO: Selezionare l'algoritmo determina l'efficienza. Un codice lineare O(n) raddoppia il tempo esatto al raddoppio degli utenti. Un codice logaritmico O(log n) mantiene frazioni di millisecondo anche decuplicando l'utenza. Un codice quadratico O(n²) collassa catastroficamente al superamento della soglia minima critica, divenendo il fattore paralizzante principale di un software mal strutturato.",
+                    ingegneria: "L'applicazione architettonica del pathfinding delle entità (Mob AI) fa uso massivo dell'algoritmo A* (A-Star). Essendo la complessità O(b^d), il calcolo iterativo dello spostamento di migliaia di entità genera lock del Main Thread. L'intervento ingegneristico impone la mitigazione tramite decostruzione dell'Activation Range (limitando le entità attive ai soli chunk adiacenti ai player), convertendo il calcolo esponenziale in segmentato e mantenendo il server stabile.",
+                    dizionario: [
+                        { emoji: "📈", term: "Big O Notation", desc: "Formulazione matematica indicante la peggiore ascesa temporale o spaziale di un algoritmo all'aumentare dell'input." },
+                        { emoji: "🧮", term: "Heuristic (Euristica)", desc: "Metodo di approssimazione logica per scavalcare calcoli completi di problemi intrattabili, giungendo a conclusioni plausibili celermente." },
+                        { emoji: "♾️", term: "Halting Problem", desc: "Teorema di Turing indicante l'impossibilità di stabilire l'eventuale blocco infinito di un programma in esecuzione." }
+                    ],
+                    quiz: {
+                        question: "Se implementiamo un ciclo per comparare ogni entità del mondo con tutte le restanti per calcolare fisicamente la collisione, quale gravità computazionale stiamo generando?",
+                        options: [
+                            "Danno catastrofico di grado O(n²), poiché mille entità richiederanno un milione di verifiche singole ad ogni tick.",
+                            "Un processo logaritmico lineare gestibile dai moderni processori.",
+                            "Un calcolo ignorato dalla CPU se l'SSD è di tipo NVMe."
+                        ],
+                        correctIndex: 0,
+                        explanation: "Accurato. Comparare tutti con tutti forma una matrice quadratica. L'implementazione del QuadTree spaziale sradica questa inefficienza dividendo la zona fisica ed isolando i test di prossimità massivi."
+                    }
+                },
+                {
+                    id: "mod-hw-010",
+                    title: "Elettrotecnica Enterprise (PDU, UPS e Power Factor)",
+                    analogia: "Pensare all'elettricità di un server come semplice corrente della spina di casa è limitante. Nel Data Center le prese (PDU) sono valvole interconnesse governabili da terminale; i salvavita (UPS) agiscono come batterie giganti immuni a blackout; la dispersione d'energia (Power Factor) risulta cruciale perché chi distribuisce corrente farà pagare severamente l'inefficienza dello spreco non incanalato nell'alimentatore del server.",
+                    ingegneria: "L'Architettura di Continuità per un'infrastruttura d'élite richiede implementazioni topologiche stringenti (es. 2N Redundancy). I sistemi Double Conversion Online UPS (VFI) trasformano alternata in continua per la batteria e nuovamente in alternata per l'outpost, eliminando totalmente il tempo di commutazione. Inoltre gli alimentatori moderni attivano la PFC (Power Factor Correction) per portare l'efficienza matematica prossima ad un valore unitario (1.0).",
+                    dizionario: [
+                        { emoji: "🔌", term: "Switched PDU", desc: "Ciabatta di rete Enterprise abilitata al comando remoto, essenziale per forzare hard-reboot sui kernel bloccati o irraggiungibili." },
+                        { emoji: "🔋", term: "UPS Online", desc: "Circuito di resilienza assoluta che distacca fisicamente l'infrastruttura da picchi e carenze di rete pubblica." },
+                        { emoji: "⚡", term: "Volt-Ampere (VA)", desc: "Misurazione di Potenza Apparente cruciale per il dimensionamento del cablaggio, discostata dai Watt Reali se il PF scende." }
+                    ],
+                    svg: `<svg viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="40" width="80" height="40" fill="#222" stroke="#ff3333" stroke-width="2"/>
+                            <text x="30" y="65" fill="#ff3333" font-family="Fira Code" font-size="12">GRID (AC)</text>
+                            
+                            <line x1="90" y1="60" x2="130" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="2"/>
+                            
+                            <rect x="130" y="20" width="140" height="80" fill="#111" stroke="#0077ff" stroke-width="2" rx="4"/>
+                            <text x="160" y="40" fill="#0077ff" font-weight="bold" font-family="Inter" font-size="12">UPS ONLINE</text>
+                            <circle cx="160" cy="70" r="15" fill="#222" stroke="#fff"/>
+                            <text x="153" y="74" fill="#fff" font-size="10">DC</text>
+                            <circle cx="210" cy="70" r="15" fill="#222" stroke="#fff"/>
+                            <text x="203" y="74" fill="#fff" font-size="10">AC</text>
+                            <line x1="175" y1="70" x2="195" y2="70" stroke="#00ff55" stroke-width="2"/>
+                            
+                            <line x1="270" y1="60" x2="310" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="2"/>
+                            
+                            <rect x="310" y="40" width="80" height="40" fill="#222" stroke="#00ff55" stroke-width="2"/>
+                            <text x="330" y="65" fill="#00ff55" font-family="Fira Code" font-size="12">SERVER</text>
+                          </svg>`,
+                    quiz: {
+                        question: "Per quale basilare motivo tecnico una PDU economica standard fallisce nel proteggere macchine remote soggette a Kernel Panic?",
+                        options: [
+                            "Costituisce una prolunga elettrica basica e non detiene interfaccia remota modulare per disconnettere o riattivare lo stato del Socket su cui è collegato individualmente il server bloccato.",
+                            "Assorbe la totalità della RAM del server.",
+                            "Si usura entro due settimane d'utilizzo."
+                        ],
+                        correctIndex: 0,
+                        explanation: "Esatto. Se il cervellone Linux freeza del tutto, le connessioni SSH muoiono. Senza braccia fisiche ad un Data Center a 500 miglia, il comando di 'Power Cycle' forzato erogato alla presa (Tramite PDU Switched) è l'ultimo miracolo per la continuità del business."
+                    }
+                }
+            ],
+            "path-devops": [
+                {
+                    id: "mod-linux-001",
+                    title: "Architettura di Sistema Linux (Kernel e FHS)",
+                    analogia: "Guidare il tuo server tramite Shell risulta analogo a pilotare un transatlantico gigante conoscendo esattamente leve e comandi del ponte della plancia, saltando l'interfaccia decorativa utente (GUI). Il Kernel Linux risiede come forza motrice sotto ponti metallici preclusi (Ring 0), proteggendo la RAM, indirizzando risorse hardware limitate e bloccando programmi esterni dal corrompere le componenti vitali. L'albero directory (FHS) garantisce ad ogni file vitale una ferrea categorizzazione.",
+                    basics: "FILESYSTEM HIERARCHY STANDARD (FHS): L'anarchia informatica viene annientata dal rigido piano edilizio delle directory. Strutture nodali come /etc/ stoccano metadati di configurazione, /var/ alloggia log e file dinamici, mentre /opt/ isola software alieno. Mantenere l'intregrità dell'indirizzamento è tassativo ed essenziale per il monitoraggio Enterprise dei processi Daemon che corrono nei backend.",
+                    ingegneria: "Il Kernel isola il controllo fisico agendo in modalità Ring 0. Qualsiasi richiesta dal ramo logico superiore (Ring 3), dove gira il nostro nodo applicativo, esige un passaggio attraverso le chiamate di sistema (System Call Interface), garantendo tolleranza contro infettività e segmentazioni del disco incontrollate. Nessuna esecuzione perniciosa esterna può paralizzare l'intero sistema se il protocollo vieta l'autonomia autoritativa (Access Control List).",
+                    dizionario: [
+                        { emoji: "🐧", term: "Kernel", desc: "Il centro nevralgico monolitico ed invalicabile delegato alla transazione dati fisici in input/output." },
+                        { emoji: "📟", term: "Shell & Bash", desc: "Interprete diretto CLI che converte testo umano in istruzione computata prima di essere mandata all'intermediario." },
+                        { emoji: "💀", term: "Kernel Panic", desc: "Arresto letale e preventivo innescato a valle di danni software critici incontrollabili nel Core." }
+                    ],
+                    svg: `<svg viewBox="0 0 350 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="50" y="20" width="250" height="30" fill="#222" stroke="#0077ff" stroke-width="2"/>
+                            <text x="100" y="40" fill="#0077ff" font-family="Inter" font-size="12">APPLICATIONS (RING 3)</text>
+                            
+                            <line x1="175" y1="50" x2="175" y2="80" stroke="#fff" stroke-width="2" stroke-dasharray="3"/>
+                            <text x="185" y="70" fill="#aaa" font-family="Fira Code" font-size="10">System Call Interface</text>
+                            
+                            <rect x="50" y="80" width="250" height="50" fill="#111" stroke="#ff3333" stroke-width="2"/>
+                            <text x="135" y="100" fill="#ff3333" font-family="Inter" font-weight="bold" font-size="12">LINUX KERNEL</text>
+                            <text x="110" y="120" fill="#ff3333" font-family="Fira Code" font-size="10">(RING 0 - HARDWARE ACCESS)</text>
+                          </svg>`,
+                    quiz: {
+                        question: "Perché costituisce un errore di ingegneria disastroso avviare il processo esecutivo Java di Minecraft come root?",
+                        options: [
+                            "Richiede più spazio occupato dalla console per i font.",
+                            "Consente un attacco pivot. Se l'applicazione terza venisse hackerata tramite exploit, conferirà all'intruso l'accesso senza limiti al Ring Root potendo persino distruggere l'intero database remoto e il disco del driver fisico.",
+                            "Accelera l'esecuzione del boot innescando incompatibilità locali coi server FTP."
+                        ],
+                        correctIndex: 1,
+                        explanation: "Perfetto. Implementiamo sempre il Principio del Privilegio Minimo. Isolando il processo in un utente dedicato ad autorità vincolata, il virus ipotetico espressione del malware bloccherà solo l'ambiente e non paralizzerà le macchine vicine, confinato nell'utente."
+                    }
+                },
+                {
+                    id: "mod-linux-002",
+                    title: "Architettura del Kernel (System Calls e Context Switching)",
+                    analogia: "Immagina il Kernel Linux come il direttore di una fabbrica iper-affollata. Un singolo dipendente (il Server di Gioco) necessita di accedere al magazzino blindato (il Disco) per salvare i dati. Non possedendo l'autorità per varcare la soglia, è costretto a depositare un modulo di richiesta formale ('System Call'). Il direttore sospende il lavoro del dipendente in attesa, archiviando provvisoriamente la sua postazione ('Context Switching') per cedere il banco a un altro lavoratore, fino al completamento del recupero dati.",
+                    basics: "IL MULTITASKING: La CPU affronta un calcolo esclusivo alla volta. La concezione estetica del Multitasking è un'illusione percettiva indotta dalla celerità: il Processore salta ferocemente da un programma all'altro frazioni di millisecondo alla volta. Lo Scheduler (CFS) governa la lista d'attesa assegnando gerarchie assolute (Nice Value).",
+                    ingegneria: "L'abuso di System Calls asincrone distrugge le prestazioni. Transire dallo spazio di memoria isolato 'User Space' al nucleo esecutivo 'Kernel Space' esige la pulizia della cache locale e lo svuotamento dei registri (TLB Flush). Nell'Ingegneria dei Server Minecraft affrontiamo il collo di bottiglia dell'I/O (Input/Output). Scrivere log riga per riga genera decine di migliaia di 'Context Switches'. Soluzione: l'implementazione del 'Buffered I/O' che cumula i testi in un blocco di RAM ed esegue una singola richiesta chirurgica in blocco.",
+                    dizionario: [
+                        { emoji: "📞", term: "System Call (Syscall)", desc: "La funzione API nativa delegata all'invocazione di servizi del Kernel da parte di applicativi limitati (User Space)." },
+                        { emoji: "🔄", term: "Context Switching", desc: "La letale e complessa manovra di congelamento dello stato completo della CPU per deviare l'operatività su un processo secondario." },
+                        { emoji: "⏱️", term: "Latency vs Throughput", desc: "La latenza decreta il tempo di attesa singolo; il throughput stabilisce la portata massima d'esecuzione continuativa." }
+                    ],
+                    quiz: {
+                        question: "Se la colonna 'cs' (Context Switches) generata a schermo dal comando di diagnostica 'vmstat' sorpassa costantemente le 100.000 unità al secondo, quale inferenza analitica risulta esatta?",
+                        options: [
+                            "Il Server vanta prestazioni eccellenti indicando l'assidua laboriosità della RAM.",
+                            "Risulta imperativa la stesura di un codice applicativo rivisitato: l'infrastruttura è paralizzata dalla conversione di stato (dal programma utente al Kernel) causata verosimilmente dall'attesa del disco meccanico o da una pessima esecuzione I/O.",
+                            "Occorre spegnere lo schermo LCD per dissipare il carico termico della GPU Linux."
+                        ],
+                        correctIndex: 1,
+                        explanation: "Appropriato. Il passaggio di contesto consuma cicli CPU. Oltre un certo limite l'hardware non esegue più il programma ma spende tutto il tempo a 'cambiare scrivania'. È sintomo di un crollo catastrofico d'efficienza input-output."
+                    }
+                },
+                {
+                    id: "mod-linux-003",
+                    title: "Filesystem Hierarchy Standard (FHS) e Inodes",
+                    analogia: "Un archivio digitale senza bussola sprofonda nell'aberrazione. L'FHS configura la planimetria universale della città Linux: i documenti amministrativi in 'etc', i resoconti fluttuanti in 'var' e l'isolamento del software alieno in 'opt'. Tuttavia, il nome estetico del file è un'illusione. Il database sottostante impiega gli 'Inode', veri codici a barre matematici incisi nel substrato del disco che contengono i permessi e le coordinate fisiche dei byte.",
+                    basics: "L'ESAURIMENTO INODE: La capacità di un disco non dipende unicamente dallo spazio (Byte), ma rigorosamente dalla disponibilità degli identificativi (Inodes). Emettere milioni di micropacchetti log di 1 kilobyte l'uno saturera il contatore degli Inodes disponibili, generando l'errore 'No space left on device' benché i grafici dichiarino centinaia di Gigabyte geometricamente liberi.",
+                    ingegneria: "L'infrastruttura d'avanguardia ripudia l'accentramento. Operiamo il Partizionamento Strategico (Partitioning) affettando logica la Storage Array: confiniamo /var e /home su punti di mount (Mount Points) strutturalmente disgiunti. Se un baco nel software esaurisce le allocazioni saturando /var di log in Loopback, il blocco colpisce esclusivamente quel quadrante salvaguardando il Kernel in /boot e annullando il Kernel Panic.",
+                    dizionario: [
+                        { emoji: "🗂️", term: "Ext4 / XFS", desc: "Format di archiviazione (Filesystem) operanti la mappatura gerarchica asimmetrica; XFS eccelle nell'orchestrazione parallela di file massivi." },
+                        { emoji: "🔗", term: "Soft Link (Symlink)", desc: "File fittizio e spettrale recante null'altro che le direzioni testuali tese verso il percorso remoto d'un Inode originale." },
+                        { emoji: "💾", term: "Mount Options (fstab)", desc: "Estremi parametri di caricamento disco al Boot, come 'noatime', per cassare l'inutile aggiornamento del registro d'accesso annullando l'I/O di scarto." }
+                    ],
+                    quiz: {
+                        question: "Per arginare latenze in scrittura su archivi di log e statistiche massive, per quale principio ingegneristico attiviamo l'opzione 'noatime' sulla partizione Ext4 all'interno del gestore fstab?",
+                        options: [
+                            "Al fine d'impedire la decriptazione malevola del Root Sector da parte di botnet.",
+                            "Per istigare un arresto fatale dei processi obsoleti entro venti giorni dall'avvio.",
+                            "Per bloccare categoricamente la registrazione del 'Timestamp di accesso' al momento della lettura dei file, annientando migliaia di operazioni secondarie di scrittura sull'Inode e fluidificando drammaticamente i cicli del disco SSD."
+                        ],
+                        correctIndex: 2,
+                        explanation: "Affermativo. Di default Linux incide l'orario di ultima lettura ogni singola volta che apri un file di log anche solo in lettura. Tale operazione sfocia in cicli di vita bruciati per l'SSD. Abbattere l'A-Time sprigiona l'efficienza assoluta su database densi."
+                    }
+                },
+                {
+                    id: "mod-linux-004",
+                    title: "Identity Management: UID, GID e Sudoers Policy",
+                    analogia: "Il sistema operativo ripudia l'esistenza del nominativo umano 'John'; i circuiti interni elaborano esclusivamente interi formali. La traslazione dell'identità converte l'individuo nel numero logico UID, raggruppandolo poi nell'aggregato GID. Conferire l'accesso supremo (Root) a casaccio assomiglia a cedere tutte le chiavi del caveau nucleare a un neo-assunto assunto temporaneo.",
+                    basics: "L'ISOLAMENTO DAEMON: I servizi server (come Nginx o l'eseguibile Minecraft) sono Daemon, programmi solitari in persistenza sullo sfondo. Executarli in assetto 'Root' condanna il Data Center; tramite una singola incrinatura (Vulnerabilità Remote Code Execution) l'assalitore acquisisce facoltà divine. La reclusione rigorosa mediante 'Account di Servizio Dedicato' paralizza l'infiltrazione all'interno del microcosmo confinato.",
+                    ingegneria: "L'infrastruttura d'impresa bandisce la password condivisa, istituendo il Tracciato di Riconoscibilità (Audit Trail). La policy Sudoers s'impone quale barriera granulare: concede a un operatore inferiore (es. 'deploy') un'eccezione microscopica, autorizzandolo unicamente a riavviare un singolo Service File tramite Systemctl ignorando l'obbligo password (NOPASSWD), pur vietando a questi il potere di scalare l'Albero Hierarchico (FHS).",
+                    dizionario: [
+                        { emoji: "🔢", term: "UID e GID", desc: "User Identifer e Group Identifier. Traslazione matriciale dell'utente biologico a cifre matematiche decriptate." },
+                        { emoji: "🧯", term: "Sudoers Policy", desc: "Contratto di delega dei privilegi centralizzato in /etc/sudoers per autorizzare comandi specifici alieni al proprio profilo base." },
+                        { emoji: "🚷", term: "Principale del Privilegio Minimo", desc: "Equazione etica e tecnica: si conferisce la minor frazione d'accesso occorrente a svolgere la mansione prefissata, null'altro in esubero." }
+                    ],
+                    quiz: {
+                        question: "Se dobbiamo consentire a un Web Developer Junior di ricaricare il server Nginx senza conferirgli lo scettro crittografico e senza mutare la password di Root in alcun modo, come operiamo?",
+                        options: [
+                            "Installiamo un software grafico VNC non crittografato ignorando le policy aziendali.",
+                            "Stiliamo ed appendiamo un comando specifico nel modulo Sudoers (es. %junior ALL=(root) NOPASSWD: /bin/systemctl reload nginx) permettendo l'espletamento isolato dell'azione loggandone l'esecuzione.",
+                            "Convertiamo provvisoriamente l'UID del Junior a '0', istantaneamente."
+                        ],
+                        correctIndex: 1,
+                        explanation: "Eccezionale. Sudo traccia il mandante del comando in /var/log/auth.log. Permettere l'esecuzione puntiforme previene la compromissione strutturale e attribuisce la responsabilità materiale dell'input all'individuo tracciabile."
+                    }
+                },
+                {
+                    id: "mod-cyber-001",
+                    title: "Sicurezza Perimetrale ed Attacchi DDoS",
+                    basics: "LARGHEZZA DI BANDA E SATURAZIONE: Immagina l'infrastruttura di rete come un tubo d'acqua. La capacità massima di trasporto si misura in Gbps (Gigabit per secondo). Un flusso di traffico illegittimo superiore alla capienza rompe la rete. In informatica, i router di fronte a volumi che superano i limiti di hardware interrupt, scartano (Drop) indipendentemente pacchetti malevoli e benigni. Questo rende il server irragiungibile.",
+                    analogia: "Difendere la base non significa ingrossare le porte del castello in attesa dei colpi, ma posizionare le sentinelle a centinaia di chilometri di distanza. Un attacco DDoS somiglia a una truppa di diecimila falsi portalettere che bloccano la reception postale. Per fermarli prima della sede centrale, occorre un ufficio di smistamento esterno (Scrubbing Center) che filtra i falsi mittenti lasciando passare solo la corrispondenza autenticata.",
+                    ingegneria: "La protezione su Layer 3 e Layer 4 necessita l'adozione dell'Anycast routing. La topologia di rete disperde il traffico di amplificazione DDoS su molteplici Punti di Presenza (PoP) globali, impedendo la concentrazione su un singolo host. Il server backend (Linux) configurerà Iptables per effettuare 'DROP' silente (scarto totale del pacchetto TCP SYN) di qualsiasi connessione tentata da indirizzi IP esterni alla rete BGP autorizzata.",
+                    dizionario: [
+                        { emoji: "🧟", term: "Botnet", desc: "Rete infetta orchestrata globalmente per generare richieste massive simultanee." },
+                        { emoji: "🧱", term: "Iptables", desc: "Firewall del Kernel Linux impiegato per filtrare i pacchetti a livello macroscopico." },
+                        { emoji: "🌍", term: "Anycast", desc: "Protocollo di routing che dirige la richiesta utente al nodo geograficamente limitrofo." }
+                    ],
+                    quiz: {
+                        question: "Per quale motivo un Firewall software residente sul pannello della macchina backend (es. UFW) risulta inefficace contro un DDoS volumetrico?",
+                        options: [
+                            "Perché UFW non supporta sistemi Linux recenti.",
+                            "Perché intercetta solo virus nei file HTML o PHP scaricati nell'infrastruttura.",
+                            "Perché la connessione in silicio della scheda di interfaccia di rete (NIC) risulta già saturata esternamente prima che il pacchetto raggiunga la valutazione software."
+                        ],
+                        correctIndex: 2,
+                        explanation: "Corretto. La protezione DDoS contro gli attacchi volumetrici richiede una capacità fisica esterna superiore a quella della connessione ospite. L'hardware blocca il traffico a monte."
+                    }
+                }
+            ],
+            "path-software": [
+                {
+                    id: "mod-sql-001",
+                    title: "Algebre di Base e Architettura Database (SQL)",
+                    analogia: "Archiviare le credenziali di centomila individui compilando documenti YAML testuali somiglia allo scrivere a mano nomi su taccuini. L'azione di ispezione richiede lo scorrimento riga per riga di ogni taccuino. I Database Relazionali sono archivi digitali automatizzati. Le Relazioni uniscono rigidamente due fogli separati tramite un identificativo logico; l'informazione risulta richiamabile tramite una query algebrica in una frazione infinitesimale di secondo.",
+                    basics: "COMPLESSITÀ LOGARITMICA BIG O (O(log n)): Una ricerca lineare in diecimila righe impiega 10.000 unità matematiche di tempo. Se operi su dati ordinati (Index B-Tree), il database divide il blocco a metà a ogni iterazione. Trovi l'informazione su diecimila righe in sole 14 analisi. Su un milione di righe necessiti 20 passaggi totali. La crescita del tempo risulta radicalmente appiattita.",
+                    ingegneria: "La struttura RDBMS (es. PostgreSQL, MariaDB) implementa l'acidità strutturale (ACID) per eludere corruzioni logiche dei dati causate da terminazioni impreviste (Out-of-Memory). La prevenzione dell'attacco 'SQL Injection' rende perentorio l'impiego dei 'Prepared Statements'. Parametrizzare i dati separa il piano esecutivo (Codice) dal payload inviato dall'host, derubricando le stringhe infette a meri testi inattivi non eseguibili dal parser SQL.",
+                    dizionario: [
+                        { emoji: "🗃️", term: "Tabella", desc: "Entità bidimensionale limitata rigidamente dallo schema di colonne e righe." },
+                        { emoji: "🗝️", term: "Primary Key", desc: "Valore assolutamente univoco richiesto per referenziare il singolo dato senza conflitti." },
+                        { emoji: "⚡", term: "Index (B-Tree)", desc: "Metastruttura dati algebrica adibita alla ricerca logaritmica fulminea bypassando le scansioni lineari." }
+                    ],
+                    svg: `<svg viewBox="0 0 350 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="40" width="80" height="40" fill="#111" stroke="#9d00ff" stroke-width="2"/>
+                            <text x="35" y="65" fill="#9d00ff" font-family="Inter" font-size="12">UUID</text>
+                            
+                            <line x1="90" y1="60" x2="160" y2="60" stroke="#fff" stroke-width="2" stroke-dasharray="2"/>
+                            
+                            <rect x="160" y="10" width="180" height="100" fill="#111" stroke="#0077ff" stroke-width="2"/>
+                            <text x="210" y="30" fill="#0077ff" font-weight="bold" font-family="Inter" font-size="12">DATABASE TABLE</text>
+                            <line x1="160" y1="40" x2="340" y2="40" stroke="#0077ff" stroke-width="1"/>
+                            <text x="170" y="60" fill="#fff" font-family="Fira Code" font-size="10">K: df9a-41.. | BAL: 5000</text>
+                            <line x1="160" y1="70" x2="340" y2="70" stroke="#0077ff" stroke-width="1"/>
+                            <text x="170" y="90" fill="#fff" font-family="Fira Code" font-size="10">K: 1c2b-8x.. | BAL: 1200</text>
+                          </svg>`,
+                    quiz: {
+                        question: "Per quale motivazione ingegneristica proibiamo categoricamente l'aggiornamento simultaneo dei nomi YAML per archiviare l'economia virtuale di diecimila utenze in un network distribuito?",
+                        options: [
+                            "I file YAML presentano colori meno accattivanti per il supporto visivo dell'ingegnere.",
+                            "L'accesso concorrente di input/output (I/O) multiplo altera i permessi del disco SSD sui server Linux.",
+                            "L'assenza della conformità ACID e la frammentazione genera lentezza letale e il rischio inevitabile di corruzione file (Wipe) in caso di caduta tensionale durante la scrittura."
+                        ],
+                        correctIndex: 2,
+                        explanation: "Centrato. Modificare in massa file testuali manca dei processi di 'Lock' e 'Rollback' necessari per prevenire che due istruzioni simultanee distruggano l'archivio. I DBMS esistono appositamente per questa sincronizzazione rigorosa."
+                    }
+                }
+            ],
+            "appendix": [
+                {
+                    id: "mod-app-001",
+                    title: "Roadmap e Glossario Definitivo",
+                    analogia: "Acquisire competenze Ingegneristiche assomiglia alla costruzione di una grande piramide. Omettere costantemente la base logico/matematica rende il piano più alto (i Linguaggi di programmazione, come Java o Python) una distesa di fango priva di attrito. Formare ingegneri richiede ordine procedurale assoluto.",
+                    ingegneria: "GLOSSARIO ESSENZIALE:\n- Abstraction: Rendere l'accesso hardware trasparente all'utente.\n- Single Point of Failure (SPOF): Vulnerabilità critica dell'architettura in cui l'interruzione di un solo elemento paralizza l'infrastruttura, mitigabile mediante la ridondanza orizzontale.\n- API (Application Programming Interface): Regolatore contrattuale che stabilisce il vocabolario di interscambio e le autorizzazioni di sistema fra applicazioni eterogenee.\n- Latency: Lasso temporale (millisecondi) dal transito del segnale; nemesi imperante per il network applicativo.",
+                    dizionario: [
+                        { emoji: "🛣️", term: "Roadmap Tecnica", desc: "Passo 1: Hardware & Linux. Passo 2: Networking CLI. Passo 3: Java Core & Pattern Object-Oriented. Passo 4: Kubernetes & Cloud CI/CD." },
+                        { emoji: "🏆", term: "Certificazioni", desc: "Obiettivi primari per la Corporate: CompTIA Network+, Red Hat RHCSA, AWS Solutions Architect e Oracle Java Associate." }
+                    ],
+                    quiz: {
+                        question: "Seleziona la definizione appropriata per Single Point of Failure (SPOF):",
+                        options: [
+                            "L'evento finale di perdita totale dell'archivio aziendale mediante cyber intrusione asimmetrica.",
+                            "Mancanza asfissiante di tolleranza causata dalla dipendenza assoluta da un solo hardware isolato in grado di sabotare l'operato totale del sistema.",
+                            "Configurazione software atta al rigetto immotivato di pacchetti HTTP."
+                        ],
+                        correctIndex: 1,
+                        explanation: "Preciso. Eliminare gli SPOF è l'ordine direttivo del Cloud Architecture. Il server database unico è un SPOF. Il database replicato (Master/Slave o RAID array) offre resilienza."
+                    }
+                }
+            ]
+        };
+
+        /**
+         * LOGICA SPA (ROUTING E RENDER)
+         */
+        const SPA = {
+            init() {
+                // Event Listener Hash
+                window.addEventListener('hashchange', () => this.handleHashRouting());
+
+                // Inizializza visualizzazione
+                this.handleHashRouting();
+
+                // Render Iniziale dei db
+                this.renderAllPaths();
+            },
+
+            navigate(targetId) {
+                window.location.hash = targetId;
+
+                document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+                const targetView = document.getElementById(targetId);
+                const targetLink = document.querySelector(`.nav-item[data-target="${targetId}"]`);
+
+                if (targetView) targetView.classList.add('active');
+                if (targetLink) targetLink.classList.add('active');
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            handleHashRouting() {
+                const hash = window.location.hash.replace('#', '') || 'home';
+                this.navigate(hash);
+            },
+
+            renderAllPaths() {
+                this.buildPath("path-minecraft", "render-minecraft");
+                this.buildPath("path-devops", "render-devops");
+                this.buildPath("path-software", "render-software");
+                this.buildPath("appendix", "render-appendix");
+            },
+
+            buildPath(dataKey, containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const pathData = TUI_DB[dataKey];
+                if (!pathData) return;
+
+                let html = '';
+
+                pathData.forEach((mod, modIdx) => {
+                    let basicsHtml = mod.basics ? `
+                        <div class="basics-box">
+                            <strong>[BASICS] PROPEDEUTICA:</strong> ${mod.basics}
+                        </div>
+                    ` : '';
+
+                    let svgHtml = mod.svg ? `
+                        <div class="sub-section">
+                            <h4>🖼️ L'ENCICLOPEDIA GRAFICA</h4>
+                            <div class="svg-container">${mod.svg}</div>
+                        </div>
+                    ` : '';
+
+                    let dictHtml = '';
+                    if (mod.dizionario) {
+                        const items = mod.dizionario.map(d => `<div class="dict-item"><strong>${d.emoji} ${d.term}</strong><br>${d.desc}</div>`).join('');
+                        dictHtml = `
+                            <div class="sub-section">
+                                <h4>📖 IL DIZIONARIO TECNICO</h4>
+                                <div class="dictionary-list">${items}</div>
+                            </div>
+                        `;
+                    }
+
+                    // Laboratorio HTML
+                    let labHtml = '';
+                    if (mod.quiz) {
+                        const qId = `quiz-${dataKey}-${modIdx}`;
+                        const opts = mod.quiz.options.map((opt, i) => {
+                            const isCorrect = i === mod.quiz.correctIndex;
+                            return `<button class="quiz-option" onclick="SPA.checkQuiz(this, ${isCorrect}, '${qId}-feedback')">${String.fromCharCode(65 + i)}. ${opt}</button>`;
+                        }).join('');
+
+                        labHtml = `
+                            <div class="lab-box">
+                                <h4 style="color:var(--text-main); margin-bottom:1rem; letter-spacing:1px;">🧪 ESERCITAZIONE INTERATTIVA</h4>
+                                <div class="quiz-question">${mod.quiz.question}</div>
+                                ${opts}
+                                <div id="${qId}-feedback" class="quiz-feedback">
+                                    <strong>Responso Elaborato:</strong> ${mod.quiz.explanation}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                        <article class="module-container" id="${mod.id}">
+                            <h2 class="module-title">${String(modIdx + 1).padStart(2, '0')} - ${mod.title}</h2>
+                            
+                            <div class="sub-section">
+                                <h4>🧩 ANALOGIA JUNIOR</h4>
+                                <p>${mod.analogia}</p>
+                            </div>
+
+                            ${basicsHtml}
+
+                            <div class="sub-section">
+                                <h4>⚙️ TRATTAZIONE INGEGNERISTICA</h4>
+                                <p>${mod.ingegneria}</p>
+                            </div>
+
+                            ${svgHtml}
+                            ${dictHtml}
+                            ${labHtml}
+                        </article>
+                    `;
+                });
+
+                container.innerHTML = html;
+            },
+
+            checkQuiz(btnEl, isCorrect, feedbackId) {
+                const parent = btnEl.parentElement;
+                // Reset styling
+                Array.from(parent.querySelectorAll('.quiz-option')).forEach(b => {
+                    b.classList.remove('correct', 'wrong');
+                    b.style.pointerEvents = 'none'; // Disattiva clic successivi
+                });
+
+                const feedbackBox = document.getElementById(feedbackId);
+
+                if (isCorrect) {
+                    btnEl.classList.add('correct');
+                    feedbackBox.className = 'quiz-feedback feedback-correct';
+                } else {
+                    btnEl.classList.add('wrong');
+                    feedbackBox.className = 'quiz-feedback feedback-wrong';
+
+                    // Mostra la corretta in verdino leggero
+                    const allBtns = parent.querySelectorAll('.quiz-option');
+                    allBtns.forEach(b => {
+                        if (b.onclick.toString().includes('true')) {
+                            b.classList.add('correct');
+                            b.style.opacity = '0.5';
+                        }
+                    });
+                }
+                feedbackBox.style.display = 'block';
+            }
+        };
+
+        /**
+         * CANVAS PARTICLES BACKGROUND (API)
+         */
+        const CanvasEngine = {
+            init() {
+                const canvas = document.getElementById('canvas-bg');
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let particles = [];
+                const mouse = { x: -1000, y: -1000, radius: 150 };
+
+                window.addEventListener('mousemove', (e) => {
+                    mouse.x = e.clientX;
+                    mouse.y = e.clientY;
+                });
+
+                function resize() {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                }
+                window.addEventListener('resize', resize);
+                resize();
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.size = Math.random() * 2 + 0.5;
+                        this.baseX = this.x;
+                        this.baseY = this.y;
+                        this.density = (Math.random() * 15) + 5;
+                        this.color = Math.random() > 0.6 ? '#00ff55' : (Math.random() > 0.5 ? '#0077ff' : '#333');
+                    }
+                    draw() {
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    update() {
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        let forceDistX = dx / dist;
+                        let forceDistY = dy / dist;
+                        let force = (mouse.radius - dist) / mouse.radius;
+                        if (force < 0) force = 0;
+
+                        let dirX = (forceDistX * force * this.density);
+                        let dirY = (forceDistY * force * this.density);
+
+                        if (dist < mouse.radius) {
+                            this.x -= dirX;
+                            this.y -= dirY;
+                        } else {
+                            if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 20;
+                            if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 20;
+                        }
+                        this.draw();
+                    }
+                }
+
+                function initParticles() {
+                    particles = [];
+                    let num = (width * height) / 12000;
+                    for (let i = 0; i < num; i++) particles.push(new Particle());
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                    }
+                    // Connection Lines
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i; j < particles.length; j++) {
+                            let dx = particles[i].x - particles[j].x;
+                            let dy = particles[i].y - particles[j].y;
+                            let dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 100) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = `rgba(255,255,255,${0.05 - dist / 2000})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(animate);
+                }
+
+                initParticles();
+                animate();
+            }
+        };
+
+        // Applicazione Avvio
+        document.addEventListener('DOMContentLoaded', () => {
+            SPA.init();
+            CanvasEngine.init();
+        });
+
+    </script>
+</body>
+
+</html>
