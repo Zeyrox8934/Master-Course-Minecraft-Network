@@ -8547,36 +8547,67 @@
             },
 
             initAfterLogin() {
-                const session = AuthManager.getSession();
-                if (!session) return;
+                console.group("🚀 Auth Flow Trace");
+                try {
+                    const session = AuthManager.getSession();
+                    if (!session) {
+                        console.warn("Nessuna sessione trovata.");
+                        console.groupEnd();
+                        return;
+                    }
+                    console.log("Sessione trovata per:", session.name);
 
-                // Header update
-                document.getElementById('header-username').textContent = session.name;
-                document.getElementById('user-badge').style.display = 'flex';
-                document.getElementById('btn-open-login').style.display = 'none';
-                document.getElementById('btn-open-register').style.display = 'none';
-                document.getElementById('btn-logout').style.display = 'inline-block';
+                    // Header update
+                    const headerUser = document.getElementById('header-username');
+                    if(headerUser) headerUser.textContent = session.name;
+                    
+                    const badge = document.getElementById('user-badge');
+                    if(badge) badge.style.display = 'flex';
+                    
+                    document.getElementById('btn-open-login').style.display = 'none';
+                    document.getElementById('btn-open-register').style.display = 'none';
+                    document.getElementById('btn-logout').style.display = 'inline-block';
 
-                // Unlock all overlays
-                document.querySelectorAll('.lock-overlay').forEach(el => el.classList.add('hidden'));
+                    // Unlock all overlays
+                    document.querySelectorAll('.lock-overlay').forEach(el => el.classList.add('hidden'));
 
-                // Dashboard welcome
-                const welcomeEl = document.getElementById('dash-welcome');
-                const subtitleEl = document.getElementById('dash-subtitle');
-                welcomeEl.innerHTML = `Bentornato, <span class="hl-blue">${session.name}</span>`;
-                subtitleEl.textContent = 'Seleziona un quadrante per iniziare o continua i tuoi studi.';
+                    // Dashboard welcome
+                    const welcomeEl = document.getElementById('dash-welcome');
+                    const subtitleEl = document.getElementById('dash-subtitle');
+                    if(welcomeEl) welcomeEl.innerHTML = `Bentornato, <span class="hl-blue">${session.name}</span>`;
+                    if(subtitleEl) subtitleEl.textContent = 'Seleziona un quadrante per iniziare o continua i tuoi studi.';
 
-                this.updateAIUI();
-                PrivateProjects.checkExpiration();
-                this.renderPrivateProjects();
-                this.renderRecentCourses();
-                
-                // Renderizza tutti i contenuti all'avvio
-                this.renderAllContent();
+                    this.updateAIUI();
+                    PrivateProjects.checkExpiration();
+                    this.renderPrivateProjects();
+                    this.renderRecentCourses();
+                    
+                    // Renderizza tutti i contenuti all'avvio
+                    console.log("Rendering dei contenuti...");
+                    this.renderAllContent();
 
-                // Gestione refresh pagina
-                const hash = window.location.hash.replace('#', '');
-                if(hash) this.navigate(hash);
+                    // CRITICO: Mostra l'applicazione principale
+                    const appContainer = document.getElementById('app');
+                    if (appContainer) {
+                        appContainer.style.display = 'block';
+                        console.log("✅ App Container reso visibile.");
+                    } else {
+                        console.error("❌ Errore Critico: Elemento #app non trovato!");
+                    }
+
+                    // Gestione refresh pagina
+                    const hash = window.location.hash.replace('#', '');
+                    if(hash) {
+                        console.log("Navigazione automatica a:", hash);
+                        this.navigate(hash);
+                    }
+
+                } catch (error) {
+                    console.error("❌ Errore durante initAfterLogin:", error);
+                    alert("Si è verificato un errore durante il caricamento del profilo. Controlla la console per i dettagli.");
+                } finally {
+                    console.groupEnd();
+                }
             },
 
             updateAIUI() {
@@ -8913,7 +8944,61 @@
         document.addEventListener('DOMContentLoaded', () => {
             CanvasEngine.init();
             SPA.init();
+            
+            // Auto-run diagnostics after a short delay to allow rendering
+            setTimeout(() => {
+                if(AuthManager.getSession()) {
+                    SystemDiagnostics.run();
+                }
+            }, 1000);
         });
+
+        /** ============================
+         *  SYSTEM DIAGNOSTICS (INTEGRATION TEST)
+         * ============================ */
+        const SystemDiagnostics = {
+            run() {
+                console.group("🔍 T.U.I. System Diagnostics");
+                let errors = 0;
+                
+                // 1. Check Session
+                const session = AuthManager.getSession();
+                console.log(`1. Session State: ${session ? "✅ Active (" + session.name + ")" : "⚠️ Guest Mode"}`);
+                
+                // 2. Check DOM Critical Elements
+                const criticalIds = ['app', 'top-header', 'sidebar', 'content', 'global-loader'];
+                criticalIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) console.log(`✅ DOM Element #${id} found.`);
+                    else { console.error(`❌ DOM Element #${id} MISSING!`); errors++; }
+                });
+
+                // 3. Check Visibility Post-Login
+                if (session) {
+                    const app = document.getElementById('app');
+                    if (app) {
+                        const display = window.getComputedStyle(app).display;
+                        if (display !== 'none') console.log(`✅ App Container is Visible (display: ${display}).`);
+                        else { console.error("❌ App Container is HIDDEN (display: none) despite active session!"); errors++; }
+                    }
+                }
+
+                // 4. Check Content Loading
+                const modules = document.querySelectorAll('.module-container');
+                console.log(`ℹ️ Modules rendered in DOM: ${modules.length}`);
+                
+                // 5. Canvas Check
+                const canvas = document.getElementById('canvas-bg');
+                if(canvas && canvas.width > 0) console.log("✅ Canvas initialized.");
+                else { console.warn("⚠️ Canvas might not be initialized."); }
+
+                if(errors === 0) console.log("%c✨ SYSTEM HEALTHY", "color: #00ff55; font-weight: bold; font-size: 1.2em;");
+                else console.log(`%c⚠️ Found ${errors} issues.`, "color: #ff3333; font-weight: bold;");
+                
+                console.groupEnd();
+                return errors === 0;
+            }
+        };
 
     </script>
 </body>
