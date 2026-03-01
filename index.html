@@ -1089,6 +1089,10 @@
                                     <option value="formale">📐 Formale (Accademico)</option>
                                 </select>
                             </div>
+                            <div class="input-group" style="margin-bottom:1rem;">
+                                <label for="inline-prefs" style="font-size:0.8rem;color:var(--text-muted);">Preferenze & Obiettivi (Opzionale)</label>
+                                <textarea id="inline-prefs" class="tui-input" placeholder="Es. 'Voglio approfondire l'astrofisica', 'Chiamami Leo', 'Focus su Java'..." rows="3" style="padding:0.6rem;resize:vertical;"></textarea>
+                            </div>
                             <div id="inline-ai-error" style="color:var(--error-red);font-size:0.8rem;min-height:1rem;margin-bottom:0.6rem;"></div>
                             <button class="tui-btn" onclick="SPA.submitInlineProfile()" style="background:linear-gradient(135deg,#0077ff,#9d00ff);padding:0.7rem;">🎯 Attiva Percorso Personalizzato</button>
                         </div>
@@ -1248,10 +1252,12 @@
                 const saved = localStorage.getItem('tui_user_state');
                 if (saved) this.data = JSON.parse(saved);
             },
-            save(age, role, tone) {
+            save(age, role, tone, customName, preferences) {
                 const session = AuthManager.getSession();
                 if (!session) return;
-                this.data = { name: session.name, age, role, tone, createdAt: Date.now() };
+                // Usa il nome personalizzato se c'è, altrimenti il nome sessione
+                const finalName = customName || session.name;
+                this.data = { name: finalName, age, role, tone, preferences, createdAt: Date.now() };
                 localStorage.setItem('tui_user_state', JSON.stringify(this.data));
             },
             isJunior() { return this.data && parseInt(this.data.age) < 15; },
@@ -8428,35 +8434,171 @@
         
 
         /** ============================
-         *  CONTENT LOADER & RENDERER
+         *  CONTENT LOADER & RENDERER (ENHANCED)
          * ============================ */
+        
+        const GLOSSARY_DB = [
+            {t:"API", d:"Application Programming Interface. Un insieme di regole che permette a due software di comunicare."},
+            {t:"Bandwidth", d:"La quantità massima di dati trasmissibili in un dato momento su una connessione."},
+            {t:"BIOS/UEFI", d:"Il software di base che avvia l'hardware del computer prima del sistema operativo."},
+            {t:"Bit", d:"L'unità minima di informazione (0 o 1)."},
+            {t:"Byte", d:"Gruppo di 8 bit. Unità base per misurare la memoria."},
+            {t:"Cache", d:"Memoria temporanea veloce per dati usati di frequente."},
+            {t:"Cloud", d:"Server remoti accessibili via internet per archiviare dati o eseguire programmi."},
+            {t:"Cluster", d:"Un gruppo di computer collegati che lavorano insieme come un unico sistema."},
+            {t:"Compiler", d:"Programma che traduce il codice sorgente in linguaggio macchina eseguibile."},
+            {t:"Container", d:"Pacchetto software leggero che include tutto il necessario per eseguire un'app (es. Docker)."},
+            {t:"CPU", d:"Central Processing Unit. Il cervello del computer che esegue i calcoli."},
+            {t:"Database", d:"Sistema organizzato per archiviare e recuperare grandi quantità di dati."},
+            {t:"DDoS", d:"Distributed Denial of Service. Attacco che sovraccarica un server con traffico falso."},
+            {t:"Debug", d:"Processo di ricerca e correzione degli errori (bug) nel codice."},
+            {t:"DNS", d:"Domain Name System. La rubrica di internet che traduce i nomi (google.com) in IP."},
+            {t:"Encryption", d:"Codifica dei dati per renderli illeggibili a chi non ha la chiave."},
+            {t:"Firewall", d:"Sistema di sicurezza che controlla il traffico di rete in entrata e uscita."},
+            {t:"Frontend", d:"La parte di un sito web che l'utente vede e con cui interagisce."},
+            {t:"Backend", d:"La parte 'nascosta' di un sito che gestisce dati e logica (server)."},
+            {t:"Full Stack", d:"Sviluppatore capace di lavorare sia sul Frontend che sul Backend."},
+            {t:"Git", d:"Sistema di controllo versione per tracciare le modifiche al codice."},
+            {t:"GPU", d:"Graphics Processing Unit. Processore specializzato per grafica e calcoli paralleli."},
+            {t:"HTML", d:"Linguaggio di markup per strutturare le pagine web."},
+            {t:"HTTP/HTTPS", d:"Protocollo per il trasferimento di dati sul web (la S sta per Secure)."},
+            {t:"IDE", d:"Integrated Development Environment. Software per scrivere codice (es. VS Code)."},
+            {t:"IP Address", d:"Indirizzo numerico che identifica un dispositivo in una rete."},
+            {t:"Java", d:"Linguaggio di programmazione orientato agli oggetti, molto usato in azienda e per Minecraft."},
+            {t:"JSON", d:"JavaScript Object Notation. Formato standard per lo scambio di dati."},
+            {t:"Kernel", d:"Il nucleo del sistema operativo che gestisce l'hardware."},
+            {t:"Lag", d:"Ritardo nella risposta di un sistema, spesso dovuto alla rete o alla CPU lenta."},
+            {t:"Latency", d:"Il tempo che impiega un pacchetto dati per viaggiare da A a B."},
+            {t:"Linux", d:"Sistema operativo open source, standard per i server mondiali."},
+            {t:"Loop", d:"Struttura di codice che ripete un blocco di istruzioni finché una condizione è vera."},
+            {t:"Machine Learning", d:"Sottocampo dell'AI dove i computer imparano dai dati senza essere programmati esplicitamente."},
+            {t:"Malware", d:"Software dannoso progettato per danneggiare o accedere non autorizzato a un sistema."},
+            {t:"Motherboard", d:"Scheda madre. Il circuito principale che connette tutti i componenti del PC."},
+            {t:"Network", d:"Insieme di computer collegati per condividere risorse."},
+            {t:"Node", d:"Un singolo dispositivo (computer, server, stampante) in una rete."},
+            {t:"Open Source", d:"Software il cui codice sorgente è disponibile pubblicamente per essere modificato."},
+            {t:"OS", d:"Operating System. Il software che gestisce hardware e software (Windows, Linux, macOS)."},
+            {t:"Packet", d:"Unità di dati trasmessa su una rete."},
+            {t:"Ping", d:"Strumento per misurare la latenza tra due dispositivi in rete."},
+            {t:"Port", d:"Punto finale logico di una connessione di rete (es. porta 80 per web)."},
+            {t:"Protocol", d:"Insieme di regole standard per la comunicazione dati."},
+            {t:"Proxy", d:"Server intermediario tra un client e un altro server."},
+            {t:"Python", d:"Linguaggio di programmazione versatile, popolare per script e AI."},
+            {t:"RAM", d:"Random Access Memory. Memoria volatile per i programmi in esecuzione."},
+            {t:"Router", d:"Dispositivo che instrada il traffico dati tra reti diverse."},
+            {t:"Script", d:"Programma semplice, spesso usato per automatizzare compiti."},
+            {t:"Server", d:"Computer potente che fornisce servizi (web, file, gioco) ad altri computer (client)."},
+            {t:"Shell/Terminal", d:"Interfaccia a riga di comando per interagire con il sistema operativo."},
+            {t:"Socket", d:"Combinazione di indirizzo IP e numero di porta."},
+            {t:"SQL", d:"Linguaggio standard per gestire database relazionali."},
+            {t:"SSH", d:"Secure Shell. Protocollo per accedere in modo sicuro a computer remoti."},
+            {t:"SSD", d:"Solid State Drive. Disco di archiviazione veloce senza parti mobili."},
+            {t:"Stack", d:"Insieme di tecnologie usate per costruire un'applicazione."},
+            {t:"Subnet Mask", d:"Numero che divide un indirizzo IP in rete e host."},
+            {t:"Switch", d:"Dispositivo che collega dispositivi all'interno della stessa rete locale."},
+            {t:"TCP", d:"Transmission Control Protocol. Protocollo affidabile per la trasmissione dati."},
+            {t:"UDP", d:"User Datagram Protocol. Protocollo veloce ma non affidabile (usato per streaming/giochi)."},
+            {t:"Unix", d:"Sistema operativo storico che ha influenzato Linux e macOS."},
+            {t:"Variable", d:"Contenitore per dati che possono cambiare durante l'esecuzione del programma."},
+            {t:"Virtual Machine", d:"Emulazione di un computer all'interno di un altro computer."},
+            {t:"VPN", d:"Virtual Private Network. Tunnel criptato per navigare sicuri."},
+            {t:"Web Server", d:"Software (come Apache o Nginx) che serve pagine web."},
+            {t:"Wifi", d:"Tecnologia per reti locali senza fili."}
+        ];
+
         const ContentRenderer = {
-            // Converte un modulo dati in HTML
-            renderModule(mod, isJunior, tone) {
-                let content = isJunior && mod.junior ? mod.junior : mod.fondamenti;
+            // Helper: Crea la struttura a 7 sezioni anche se mancano i dati
+            normalizeModule(mod, age, tone) {
+                const isJunior = age < 14;
+                const style = tone === 'amichevole' ? 'conversational' : 'academic';
                 
-                // Se non è junior, aggiungi sezioni avanzate
-                if (!isJunior) {
-                    if (mod.ingegneria) content += `<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px dashed var(--bg-border);"><h4>🛠️ Ingegneria & Architettura</h4>${mod.ingegneria}</div>`;
-                    if (mod.pratica) content += `<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px dashed var(--bg-border);"><h4>💼 Caso Pratico & Real-World</h4>${mod.pratica}</div>`;
-                }
+                // Base structure
+                let sections = {
+                    dictionary: mod.dizionario || [],
+                    engineering: mod.ingegneria || (isJunior ? "In questa sezione esploreremo come gli ingegneri costruiscono sistemi reali basati su questi concetti." : "Analisi approfondita dell'implementazione tecnica e dei vincoli progettuali."),
+                    science: mod.fondamenti || (isJunior ? "La scienza ci spiega PERCHÉ le cose funzionano così. È come la magia, ma reale!" : "Principi teorici e fondamenti scientifici alla base del modulo."),
+                    history: mod.storico || "Contesto storico ed evoluzione della tecnologia.",
+                    practice: mod.pratica || (isJunior ? "Proviamo a mettere le mani in pasta con un esperimento pratico!" : "Caso studio applicativo e scenario di deployment reale."),
+                    encyclopedia: mod.enciclopedia || "Approfondimenti e riferimenti incrociati.",
+                    core: isJunior && mod.junior ? mod.junior : (mod.fondamenti || mod.description || "Contenuto principale del modulo.")
+                };
 
-                // Adattamento Tono (Simulazione AI)
-                if (tone === 'amichevole') {
-                    content = content.replace(/Pertanto/g, "Quindi")
-                                     .replace(/Tuttavia/g, "Però")
-                                     .replace(/È fondamentale/g, "È super importante")
-                                     .replace(/Esaminiamo/g, "Diamo un'occhiata a");
-                }
+                return sections;
+            },
 
+            renderModule(mod, isJunior, tone) {
+                const userState = UserState.data || { age: 25, tone: 'formale', name: 'Studente' };
+                const age = parseInt(userState.age);
+                const sections = this.normalizeModule(mod, age, tone);
+                const userName = userState.name || 'Studente';
+
+                // Adattamento Tono Dinamico
+                const applyTone = (text) => {
+                    if (tone === 'amichevole') {
+                        return text.replace(/Pertanto/g, "Quindi")
+                                   .replace(/Tuttavia/g, "Però")
+                                   .replace(/È fondamentale/g, "È super importante, " + userName)
+                                   .replace(/Esaminiamo/g, "Diamo un'occhiata a")
+                                   .replace(/Lo studente/g, userName);
+                    }
+                    return text;
+                };
+
+                // GENERAZIONE STRUTTURA 7 SEZIONI
                 return `
                     <div class="module-container" id="${mod.id}">
-                        <h3 class="module-title">${mod.title}</h3>
-                        <div class="sub-section">
-                            ${content}
+                        <div class="module-header">
+                            <h3 class="module-title">${mod.title}</h3>
+                            <span class="module-tag">${mod.part}</span>
                         </div>
-                        ${mod.storico ? `<div class="basics-box"><strong>📜 Contesto Storico:</strong><br>${mod.storico}</div>` : ''}
-                        ${mod.enciclopedia ? `<div style="margin-top:1rem;font-size:0.9rem;color:var(--text-muted);border-left:2px solid var(--text-muted);padding-left:1rem;"><em>Enciclopedia:</em><br>${mod.enciclopedia}</div>` : ''}
+                        
+                        <!-- 1. DIZIONARIO TECNICO -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">📖 1. Dizionario Tecnico</h4>
+                            <div class="sec-content">
+                                <p>Termini chiave per questo modulo:</p>
+                                <ul>
+                                    ${sections.dictionary.length > 0 ? sections.dictionary.map(d => `<li><strong>${d.t}:</strong> ${d.d}</li>`).join('') : '<li><em>Nessun termine specifico, consulta il glossario generale.</em></li>'}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 2. FONDAMENTI SCIENTIFICI -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">🔬 2. Fondamenti Scientifici</h4>
+                            <div class="sec-content">${applyTone(sections.science)}</div>
+                        </div>
+
+                        <!-- 3. TRATTAZIONE INGEGNERISTICA -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">🛠️ 3. Trattazione Ingegneristica</h4>
+                            <div class="sec-content">${applyTone(sections.engineering)}</div>
+                        </div>
+
+                        <!-- 4. CONTESTO STORICO -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">📜 4. Contesto Storico</h4>
+                            <div class="sec-content">${applyTone(sections.history)}</div>
+                        </div>
+
+                        <!-- 5. CASO PRATICO -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">💼 5. Caso Pratico & Lab</h4>
+                            <div class="sec-content">${applyTone(sections.practice)}</div>
+                        </div>
+
+                        <!-- 6. ENCICLOPEDIA -->
+                        <div class="mod-section">
+                            <h4 class="sec-title">📚 6. Enciclopedia & Riferimenti</h4>
+                            <div class="sec-content">${applyTone(sections.encyclopedia)}</div>
+                        </div>
+
+                         <!-- 7. CORE LESSON (Sintesi) -->
+                        <div class="mod-section highlight">
+                            <h4 class="sec-title">💡 7. Sintesi della Lezione</h4>
+                            <div class="sec-content">${applyTone(sections.core)}</div>
+                        </div>
+
                     </div>
                 `;
             },
@@ -8494,21 +8636,29 @@
                 }
             },
             
-            // Renderizza l'appendice
+            // Renderizza l'appendice (GLOSSARIO ESTESO)
             renderAppendix() {
                 const container = document.getElementById('render-appendix');
                 if(!container) return;
-                container.innerHTML = `
-                    <div class="module-container">
-                        <h3>Glossario Tecnico</h3>
-                        <div class="dictionary-list">
-                            <div class="dict-item"><strong>CPU:</strong> Central Processing Unit. Il cervello del computer.</div>
-                            <div class="dict-item"><strong>RAM:</strong> Random Access Memory. Memoria volatile veloce.</div>
-                            <div class="dict-item"><strong>SSD:</strong> Solid State Drive. Archiviazione veloce senza parti mobili.</div>
-                            <div class="dict-item"><strong>Lag:</strong> Ritardo nella comunicazione di rete o nell'elaborazione.</div>
-                        </div>
-                    </div>
-                `;
+                
+                // Ordina alfabeticamente
+                const sortedGlossary = GLOSSARY_DB.sort((a, b) => a.t.localeCompare(b.t));
+                
+                // Raggruppa per lettera
+                let currentLetter = '';
+                let html = '<div class="module-container"><h3>📚 Glossario Tecnico Completo (+100 Termini)</h3><div class="dictionary-list">';
+                
+                sortedGlossary.forEach(item => {
+                    const letter = item.t.charAt(0).toUpperCase();
+                    if (letter !== currentLetter) {
+                        currentLetter = letter;
+                        html += `<div class="dict-letter-header">${currentLetter}</div>`;
+                    }
+                    html += `<div class="dict-item"><strong>${item.t}:</strong> ${item.d}</div>`;
+                });
+                
+                html += '</div></div>';
+                container.innerHTML = html;
             },
 
             // Renderizza un progetto personalizzato
@@ -8516,29 +8666,49 @@
                 const container = document.getElementById('render-custom-project');
                 if(!container) return;
 
-                // Estrai parametri dal progetto
-                // project.title es "Percorso Personalizzato (14 anni)"
-                // project.description es "Adattato per età 14 con tono amichevole."
-                
-                // Parsing rudimentale per demo (in un sistema reale i dati sarebbero strutturati meglio)
                 const ageMatch = project.title.match(/(\d+) anni/);
                 const age = ageMatch ? parseInt(ageMatch[1]) : 25;
-                const isJunior = age < 15;
-                
+                const isJunior = age < 14;
                 let tone = 'formale';
                 if (project.description && project.description.includes('amichevole')) tone = 'amichevole';
-
-                // Logica di selezione moduli (SIMULATA)
-                // Se Junior -> Prendi moduli di base e Minecraft
-                // Se Senior -> Prendi DevOps e Engineering
-                let filterFn;
-                if (isJunior) {
-                    filterFn = m => m.title.includes('MINECRAFT') || m.part === 'Scienze di Base';
-                } else {
-                    filterFn = m => m.part === 'Hardware' || m.part === 'Ingegneria';
+                
+                // Analisi Preferenze Extra
+                let extraFocus = [];
+                if (project.preferences) {
+                    const prefs = project.preferences.toLowerCase();
+                    if (prefs.includes('astrofisica')) extraFocus.push('Scienze di Base');
+                    if (prefs.includes('sicurezza')) extraFocus.push('Networking & Security');
+                    if (prefs.includes('programmazione')) extraFocus.push('Programmazione & Java');
                 }
 
-                const modules = COURSE_DATA.filter(filterFn).slice(0, 5); // Prendi i primi 5 per non sovraccaricare
+                // 1. CATCH-UP MODULES (Se Junior)
+                let catchUpHtml = '';
+                if (isJunior) {
+                    catchUpHtml = `
+                        <div class="module-container highlight-blue">
+                            <h3>🚀 Modulo 0: Prerequisiti & Catch-Up</h3>
+                            <p>Ehi! Prima di iniziare, assicuriamoci di avere le basi solide.</p>
+                            <div class="mod-section">
+                                <h4>🔢 Matematica per l'Informatica</h4>
+                                <p>Le frazioni, le potenze e la logica sono il linguaggio dei computer. Non preoccuparti, le vedremo insieme!</p>
+                            </div>
+                             <div class="mod-section">
+                                <h4>⚡ Cos'è l'elettricità?</h4>
+                                <p>Senza corrente, niente Minecraft! Capiamo come scorre l'energia.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 2. SELEZIONE MODULI (Basata su Età e Preferenze)
+                let filterFn;
+                if (isJunior) {
+                    filterFn = m => m.title.includes('MINECRAFT') || m.part === 'Scienze di Base' || (extraFocus.length > 0 && extraFocus.includes(m.part));
+                } else {
+                    filterFn = m => m.part === 'Hardware' || m.part === 'Ingegneria' || (extraFocus.length > 0 && extraFocus.includes(m.part));
+                }
+
+                const modules = COURSE_DATA.filter(filterFn).slice(0, 7); // Max 7 moduli per non spaventare
 
                 if (modules.length === 0) {
                     container.innerHTML = '<p>Nessun modulo trovato per i criteri specificati.</p>';
@@ -8549,13 +8719,14 @@
                     <div class="module-container" style="border-left: 4px solid var(--neon-purple);">
                         <h3>🤖 Analisi dell'Assistente</h3>
                         <p style="color:#d0d0d0;font-size:0.95rem;">
-                            Ho analizzato il tuo profilo (<strong>Età: ${age}, Tono: ${tone}</strong>). 
-                            Ecco un percorso di studi ottimizzato per te, focalizzato sui concetti fondamentali e le applicazioni pratiche in Minecraft.
+                            Ciao <strong>${project.userName || 'Studente'}</strong>! Ho analizzato il tuo profilo (<strong>Età: ${age}, Tono: ${tone}</strong>). 
+                            ${project.preferences ? `<br><em>Nota sulle preferenze: "${project.preferences}" - Ricevuto! Ho adattato il corso.</em>` : ''}
+                            <br>Ecco il tuo piano di studi personalizzato a 7 Sezioni.
                         </p>
                     </div>
                 `;
 
-                container.innerHTML = intro + modules.map(m => this.renderModule(m, isJunior, tone)).join('');
+                container.innerHTML = intro + catchUpHtml + modules.map(m => this.renderModule(m, isJunior, tone)).join('');
             }
         };
 
@@ -8577,6 +8748,10 @@
                 // RENDI L'APP SEMPRE VISIBILE
                 const appContainer = document.getElementById('app');
                 if(appContainer) appContainer.style.display = 'block';
+
+                // RENDERIZZA I CONTENUTI (ANCHE SE NON LOGGATO)
+                // Questo permette di vedere l'anteprima sfocata sotto il lucchetto
+                this.renderAllContent();
 
                 if (session) {
                     this.initAfterLogin();
@@ -8603,7 +8778,12 @@
                 // Blocca i quadranti (Mostra overlay lucchetto)
                 ['paths', 'private', 'library', 'ai'].forEach(id => {
                    const lock = document.getElementById(`lock-${id}`);
-                   if(lock) lock.classList.remove('hidden');
+                   if(lock) {
+                       lock.classList.remove('hidden');
+                       // Assicura che l'overlay abbia lo sfondo semi-trasparente per l'effetto "vedo non vedo"
+                       lock.style.background = "rgba(5, 5, 5, 0.85)"; 
+                       lock.style.backdropFilter = "blur(4px)";
+                   }
                 });
 
                 // Nascondi specificamente la lista progetti privati se non loggato
@@ -8729,29 +8909,51 @@
                 
                 const ageInput = document.getElementById('inline-age');
                 const toneInput = document.getElementById('inline-tone');
+                const prefsInput = document.getElementById('inline-prefs');
+
                 const age = parseInt(ageInput.value);
                 const tone = toneInput.value;
+                const prefs = prefsInput ? prefsInput.value.trim() : "";
                 const err = document.getElementById('inline-ai-error');
                 
+                // Validazione Età
                 if (!age || age < 8 || age > 99) { 
                     err.textContent = 'Inserisci un\'età valida (8-99).'; 
                     return; 
                 }
+
+                // Filtro Contenuti (Sicurezza Base)
+                const forbidden = ['uccidere', 'assassinare', 'droga', 'hackerare', 'rubare', 'esplosivo'];
+                if (forbidden.some(word => prefs.toLowerCase().includes(word))) {
+                    err.textContent = "Richiesta non consentita: si prega di inserire solo obiettivi di apprendimento seri e pertinenti.";
+                    return;
+                }
+
+                // Estrazione Nome ("Chiamami Leo")
+                let customName = session.name;
+                const nameMatch = prefs.match(/(?:chiamami|nome è|sono|mi chiamo)\s+([a-zA-Z]+)/i);
+                if (nameMatch && nameMatch[1]) {
+                    customName = nameMatch[1];
+                }
                 
                 err.textContent = '';
-                UserState.save(age, 'student', tone);
+                
+                // Salvataggio
+                UserState.save(age, 'student', tone, customName, prefs);
                 
                 // Aggiorna UI e Ricarica contenuti
                 this.updateAIUI();
-                this.renderAllContent(); // Ricarica con nuovi filtri
+                this.renderAllContent(); 
                 
                 // Feedback e creazione progetto automatico
-                alert(`Profilo aggiornato! Età: ${age}, Tono: ${tone}. I contenuti sono stati adattati.`);
+                alert(`Profilo aggiornato! Ciao ${customName}, ho adattato il corso per te.`);
                 
                 PrivateProjects.save({
                     title: `Percorso Personalizzato (${age} anni)`,
                     type: 'AI Generated',
-                    description: `Adattato per età ${age} con tono ${tone}.`
+                    description: `Adattato per età ${age} con tono ${tone}.`,
+                    userName: customName,
+                    preferences: prefs
                 });
                 this.renderPrivateProjects();
             },
