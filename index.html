@@ -1150,6 +1150,15 @@
                 </div>
             </section>
 
+            <!-- VISTA PROGETTO PERSONALIZZATO -->
+            <section id="custom-project-view" class="section-view">
+                <header class="page-header">
+                    <h1><span class="hl-purple">Progetto</span> Personalizzato</h1>
+                    <p id="custom-project-desc" style="color:var(--text-muted)">Il tuo percorso su misura generato dall'IA.</p>
+                </header>
+                <div id="render-custom-project"></div>
+            </section>
+
         </main>
     </div>
 
@@ -8500,6 +8509,53 @@
                         </div>
                     </div>
                 `;
+            },
+
+            // Renderizza un progetto personalizzato
+            renderCustomProject(project) {
+                const container = document.getElementById('render-custom-project');
+                if(!container) return;
+
+                // Estrai parametri dal progetto
+                // project.title es "Percorso Personalizzato (14 anni)"
+                // project.description es "Adattato per età 14 con tono amichevole."
+                
+                // Parsing rudimentale per demo (in un sistema reale i dati sarebbero strutturati meglio)
+                const ageMatch = project.title.match(/(\d+) anni/);
+                const age = ageMatch ? parseInt(ageMatch[1]) : 25;
+                const isJunior = age < 15;
+                
+                let tone = 'formale';
+                if (project.description && project.description.includes('amichevole')) tone = 'amichevole';
+
+                // Logica di selezione moduli (SIMULATA)
+                // Se Junior -> Prendi moduli di base e Minecraft
+                // Se Senior -> Prendi DevOps e Engineering
+                let filterFn;
+                if (isJunior) {
+                    filterFn = m => m.title.includes('MINECRAFT') || m.part === 'Scienze di Base';
+                } else {
+                    filterFn = m => m.part === 'Hardware' || m.part === 'Ingegneria';
+                }
+
+                const modules = COURSE_DATA.filter(filterFn).slice(0, 5); // Prendi i primi 5 per non sovraccaricare
+
+                if (modules.length === 0) {
+                    container.innerHTML = '<p>Nessun modulo trovato per i criteri specificati.</p>';
+                    return;
+                }
+
+                const intro = `
+                    <div class="module-container" style="border-left: 4px solid var(--neon-purple);">
+                        <h3>🤖 Analisi dell'Assistente</h3>
+                        <p style="color:#d0d0d0;font-size:0.95rem;">
+                            Ho analizzato il tuo profilo (<strong>Età: ${age}, Tono: ${tone}</strong>). 
+                            Ecco un percorso di studi ottimizzato per te, focalizzato sui concetti fondamentali e le applicazioni pratiche in Minecraft.
+                        </p>
+                    </div>
+                `;
+
+                container.innerHTML = intro + modules.map(m => this.renderModule(m, isJunior, tone)).join('');
             }
         };
 
@@ -8631,10 +8687,29 @@
             },
 
             renderAllContent() {
-                // Filtri logici per i vari percorsi
-                ContentRenderer.renderPath('render-minecraft', m => m.part === 'Hardware' || m.title.includes('MINECRAFT'));
-                ContentRenderer.renderPath('render-devops', m => m.part === 'Hardware' || m.part === 'Scienze di Base'); // Esempio
-                ContentRenderer.renderPath('render-software', m => m.part === 'Scienze di Base'); // Esempio
+                // FILTRI PERCORSI OTTIMIZZATI PER RUOLO
+
+                // 1. MINECRAFT ARCHITECT (System Admin & Network Owner)
+                // Focus: Hardware fisico, Gestione OS Linux, Ottimizzazione Server
+                ContentRenderer.renderPath('render-minecraft', m => 
+                    ['Hardware', 'Linux Administration'].includes(m.part) || 
+                    m.title.includes('MINECRAFT') ||
+                    (m.part === 'Networking & Security' && (m.title.includes('TCP') || m.title.includes('DDoS')))
+                );
+
+                // 2. ENTERPRISE DEVOPS (Cloud & Infrastructure)
+                // Focus: Linux avanzato, Networking, Cloud, Sicurezza, AI Management
+                ContentRenderer.renderPath('render-devops', m => 
+                    ['Linux Administration', 'Networking & Security', 'Cloud / AI & Management'].includes(m.part)
+                );
+
+                // 3. SOFTWARE ENGINEERING (Developer)
+                // Focus: Fondamenta scientifiche, Java, Algoritmi, Bot Development
+                ContentRenderer.renderPath('render-software', m => 
+                    ['Scienze di Base', 'Programmazione & Java', 'Discord & Bot Development'].includes(m.part)
+                );
+
+                // Risorse Comuni
                 ContentRenderer.renderLibrary();
                 ContentRenderer.renderAppendix();
             },
@@ -8699,6 +8774,23 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             },
 
+            openProject(projectIndex) {
+                const projects = PrivateProjects.getAll();
+                const project = projects[projectIndex];
+                if (!project) return;
+
+                // Mostra la sezione custom
+                document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                
+                const view = document.getElementById('custom-project-view');
+                if(view) view.classList.add('active');
+
+                // Renderizza
+                ContentRenderer.renderCustomProject(project);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
             renderPrivateProjects() {
                 const list = document.getElementById('private-projects-list');
                 const projects = PrivateProjects.getAll();
@@ -8706,13 +8798,13 @@
                     list.innerHTML = `<p style="font-size:0.83rem;color:var(--text-muted);font-style:italic;">Nessun progetto salvato.</p>`;
                     return;
                 }
-                list.innerHTML = projects.map(p => `
+                list.innerHTML = projects.map((p, index) => `
                     <div class="private-project-item">
                         <div>
                             <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">${p.title}</div>
                             <div class="private-project-meta">${p.type} • ${new Date(p.date).toLocaleDateString()}</div>
                         </div>
-                        <button class="tui-btn" style="padding:0.4rem 0.8rem;width:auto;font-size:0.8rem;background:var(--bg-surface);border:1px solid var(--neon-purple);" onclick="alert('Apertura progetto: ${p.title}')">APRI</button>
+                        <button class="tui-btn" style="padding:0.4rem 0.8rem;width:auto;font-size:0.8rem;background:var(--bg-surface);border:1px solid var(--neon-purple);" onclick="SPA.openProject(${index})">APRI</button>
                     </div>
                 `).join('');
             },
