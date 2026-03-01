@@ -8574,6 +8574,10 @@
                 UserState.init();
                 const session = AuthManager.getSession();
 
+                // RENDI L'APP SEMPRE VISIBILE
+                const appContainer = document.getElementById('app');
+                if(appContainer) appContainer.style.display = 'block';
+
                 if (session) {
                     this.initAfterLogin();
                 } else {
@@ -8595,11 +8599,16 @@
                 document.getElementById('btn-open-register').style.display = 'inline-block';
                 document.getElementById('btn-logout').style.display = 'none';
                 document.getElementById('user-badge').style.display = 'none';
-                // Blocca i quadranti
+                
+                // Blocca i quadranti (Mostra overlay lucchetto)
                 ['paths', 'private', 'library', 'ai'].forEach(id => {
                    const lock = document.getElementById(`lock-${id}`);
                    if(lock) lock.classList.remove('hidden');
                 });
+
+                // Nascondi specificamente la lista progetti privati se non loggato
+                const privateList = document.getElementById('private-projects-list');
+                if(privateList) privateList.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Effettua il login per visualizzare i tuoi progetti.</p>';
             },
 
             initAfterLogin() {
