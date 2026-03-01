@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zeyrox8934.github.io/Master-Course-Minecraft-Network/sitemap.xml
