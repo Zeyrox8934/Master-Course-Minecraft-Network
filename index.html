@@ -1275,13 +1275,59 @@
                 const s = localStorage.getItem('tui_projects');
                 return s ? JSON.parse(s) : [];
             },
-            save(project) {
-                const projects = this.getAll();
-                projects.push({ ...project, date: Date.now() });
-                if (projects.length > 5) projects.shift();
-                localStorage.setItem('tui_projects', JSON.stringify(projects));
+            
+            // Controlla limiti creazione
+            canCreate() {
+                // 1. Limite Archivio: Max 3 progetti salvati contemporaneamente
+                const currentProjects = this.getAll();
+                if (currentProjects.length >= 3) {
+                    return { allowed: false, reason: "Hai raggiunto il limite di 3 progetti archiviati. Eliminane uno per crearne di nuovi." };
+                }
+
+                // 2. Limite Mensile: Max 5 creazioni al mese
+                const now = new Date();
+                const key = `tui_creates_${now.getFullYear()}_${now.getMonth()}`; // Es: tui_creates_2024_5
+                const monthlyCount = parseInt(localStorage.getItem(key) || '0');
+                
+                if (monthlyCount >= 5) {
+                    return { allowed: false, reason: "Hai raggiunto il limite mensile di 5 nuovi progetti. Riprova il mese prossimo." };
+                }
+
+                return { allowed: true };
             },
-                        checkExpiration() {
+
+            incrementMonthlyCounter() {
+                const now = new Date();
+                const key = `tui_creates_${now.getFullYear()}_${now.getMonth()}`;
+                const monthlyCount = parseInt(localStorage.getItem(key) || '0');
+                localStorage.setItem(key, monthlyCount + 1);
+            },
+
+            save(project) {
+                const check = this.canCreate();
+                if (!check.allowed) {
+                    alert(`🚫 Impossibile salvare: ${check.reason}`);
+                    return false;
+                }
+
+                const projects = this.getAll();
+                projects.unshift({ ...project, date: Date.now(), id: Date.now().toString() }); // Unshift per mettere in cima
+                localStorage.setItem('tui_projects', JSON.stringify(projects));
+                this.incrementMonthlyCounter();
+                return true;
+            },
+
+            delete(index) {
+                const projects = this.getAll();
+                if (index >= 0 && index < projects.length) {
+                    projects.splice(index, 1);
+                    localStorage.setItem('tui_projects', JSON.stringify(projects));
+                    return true;
+                }
+                return false;
+            },
+
+            checkExpiration() {
                 const projects = this.getAll();
                 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
                 const now = Date.now();
@@ -8764,6 +8810,17 @@
                     const item = e.target.closest('.nav-item');
                     if (item) {
                         const target = item.dataset.target;
+                        
+                        // BLOCCO NAVIGAZIONE SE NON LOGGATO
+                        const currentSession = AuthManager.getSession();
+                        if (!currentSession && target !== 'home') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // Feedback visivo opzionale (shake o alert)
+                            alert("🔒 Contenuto Bloccato. Effettua l'accesso per esplorare questo percorso.");
+                            return;
+                        }
+
                         if (target) this.navigate(target);
                     }
                 });
@@ -8945,21 +9002,33 @@
                 this.updateAIUI();
                 this.renderAllContent(); 
                 
-                // Feedback e creazione progetto automatico
-                alert(`Profilo aggiornato! Ciao ${customName}, ho adattato il corso per te.`);
-                
-                PrivateProjects.save({
+                // Tenta di creare il progetto
+                const success = PrivateProjects.save({
                     title: `Percorso Personalizzato (${age} anni)`,
                     type: 'AI Generated',
                     description: `Adattato per età ${age} con tono ${tone}.`,
                     userName: customName,
                     preferences: prefs
                 });
-                this.renderPrivateProjects();
+
+                if (success) {
+                    alert(`Profilo aggiornato! Ciao ${customName}, ho adattato il corso per te.`);
+                    this.renderPrivateProjects();
+                } else {
+                    // Se fallisce il salvataggio progetto (limite raggiunto), avvisa ma mantiene le preferenze attive
+                    alert(`Profilo aggiornato! Ciao ${customName}, il corso è stato adattato.\n\nNOTA: Non ho potuto salvare il progetto nell'archivio perché hai raggiunto il limite mensile o di archiviazione.`);
+                }
             },
 
             navigate(targetId) {
                 if(!targetId) return;
+
+                // CONTROLLO DI SICUREZZA
+                const session = AuthManager.getSession();
+                if (!session && targetId !== 'home') {
+                    alert("🔒 Accesso Negato. Effettua il login per accedere a questo contenuto.");
+                    return;
+                }
 
                 // Gestione UI Attiva
                 document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
@@ -9005,19 +9074,33 @@
             renderPrivateProjects() {
                 const list = document.getElementById('private-projects-list');
                 const projects = PrivateProjects.getAll();
+                
+                // Aggiorna contatore visibile (opzionale) o mostra limiti
+                // ...
+                
                 if (projects.length === 0) {
                     list.innerHTML = `<p style="font-size:0.83rem;color:var(--text-muted);font-style:italic;">Nessun progetto salvato.</p>`;
                     return;
                 }
                 list.innerHTML = projects.map((p, index) => `
                     <div class="private-project-item">
-                        <div>
+                        <div style="flex:1;">
                             <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">${p.title}</div>
                             <div class="private-project-meta">${p.type} • ${new Date(p.date).toLocaleDateString()}</div>
                         </div>
-                        <button class="tui-btn" style="padding:0.4rem 0.8rem;width:auto;font-size:0.8rem;background:var(--bg-surface);border:1px solid var(--neon-purple);" onclick="SPA.openProject(${index})">APRI</button>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="tui-btn" style="padding:0.4rem 0.8rem;width:auto;font-size:0.8rem;background:var(--bg-surface);border:1px solid var(--neon-purple);" onclick="SPA.openProject(${index})">APRI</button>
+                            <button class="tui-btn" style="padding:0.4rem 0.6rem;width:auto;font-size:0.9rem;background:rgba(255, 51, 51, 0.1);border:1px solid var(--error-red);color:var(--error-red);" onclick="SPA.deleteProject(${index})" title="Elimina Progetto">🗑️</button>
+                        </div>
                     </div>
                 `).join('');
+            },
+
+            deleteProject(index) {
+                if (confirm("Sei sicuro di voler eliminare questo progetto? L'operazione non è reversibile.")) {
+                    PrivateProjects.delete(index);
+                    this.renderPrivateProjects();
+                }
             },
 
             renderRecentCourses() {
