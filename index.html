@@ -941,6 +941,13 @@
             background: rgba(255, 51, 51, 0.08);
         }
 
+        .quiz-option.correct-answer-highlight {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 85, 0.04);
+            box-shadow: 0 0 10px rgba(0, 255, 85, 0.2);
+            font-weight: 600;
+        }
+
         .quiz-feedback {
             display: none;
             margin-top: 1rem;
@@ -1691,16 +1698,16 @@
             init() {
                 this.data = TUI_Storage.get('user_state');
                 if (!this.data) {
-                    // Default state
-                    this.data = { age: 25, role: '', tone: 'formale', preferences: '', mode: 'Master', exercises: true };
+                    // Default state (Age/Tone removed from persistent state)
+                    this.data = { role: '', preferences: '', mode: 'Master', exercises: true };
                 }
             },
-            save(age, role, tone, customName, preferences, mode, exercises) {
+            save(role, customName, preferences, mode, exercises) {
                 const session = AuthManager.getSession();
                 if (!session) return;
                 const finalName = customName || session.name;
                 this.data = {
-                    name: finalName, age, role, tone, preferences,
+                    name: finalName, role, preferences,
                     mode: mode || this.data.mode || 'Master',
                     exercises: exercises !== undefined ? exercises : this.data.exercises,
                     updatedAt: Date.now()
@@ -10791,9 +10798,8 @@
                     const st = document.getElementById('ai-profile-status');
                     st.style.display = 'block';
                     const mode = UserState.getMode();
-                    const tone = UserState.data.tone || 'formale';
                     const roleLabel = UserState.data.role ? ` | Ruolo: <strong>${UserState.data.role}</strong>` : '';
-                    st.innerHTML = `✅ Profilo Attivo &mdash; Età: <strong>${UserState.data.age}</strong> | Tono: <strong>${tone}</strong>${roleLabel} | Modalità: <strong class="hl-blue">${mode}</strong>`;
+                    st.innerHTML = `✅ Profilo Attivo | Modalità: <strong class="hl-blue">${mode}</strong>${roleLabel}`;
                     document.getElementById('ai-inline-form').style.display = 'none';
 
                     // Pre-fill fields just in case (retained from original)
@@ -10803,11 +10809,11 @@
                     const inlineRuolo = document.getElementById('inline-ruolo'); // Added for completeness
                     const inlineExercises = document.getElementById('inline-exercises'); // Added for completeness
 
-                    if (inlineAge) inlineAge.value = UserState.data.age;
-                    if (inlineTone) inlineTone.value = UserState.data.tone;
+                    if (inlineAge) inlineAge.value = 25; // Default age
+                    if (inlineTone) inlineTone.value = 'formale'; // Default tone
                     if (inlinePrefs) inlinePrefs.value = UserState.data.preferences || '';
                     if (inlineRuolo) inlineRuolo.value = UserState.data.role || '';
-                    if (inlineExercises) inlineExercises.checked = UserState.data.exercises !== false; // Default to true if not explicitly false
+                    if (inlineExercises) inlineExercises.checked = UserState.data.exercises !== false;
 
                     // Update mode buttons based on UserState
                     const modeBtnCompleto = document.getElementById('mode-btn-completo');
@@ -10867,6 +10873,22 @@
                 // Risorse Comuni
                 ContentRenderer.renderLibrary();
                 ContentRenderer.renderAppendix();
+            },
+
+            openAIPathForm() {
+                // Se siamo già loggati, resetta il form e mostralo
+                const session = AuthManager.getSession();
+                if (!session) { AuthUI.openModal('login'); return; }
+
+                // Naviga al quadrante AI
+                this.navigate('home');
+                const quadAI = document.getElementById('quad-ai');
+                if (quadAI) {
+                    quadAI.scrollIntoView({ behavior: 'smooth' });
+                    // Forza visibilità del form
+                    document.getElementById('ai-inline-form').style.display = 'block';
+                    document.getElementById('ai-profile-status').style.display = 'none';
+                }
             },
 
             switchMode(mode) {
@@ -10941,8 +10963,8 @@
                 // SIMULAZIONE IA: Generazione Overrides
                 const aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '');
 
-                // Salvataggio stato con modalità corrente e preferenza esercizi
-                UserState.save(age, isRuoloMode ? ruoloText : 'completo', tone, customName, prefs, UserState.getMode(), includeEx);
+                // Salvataggio stato (Rimosso age/tone persistenti)
+                UserState.save(isRuoloMode ? ruoloText : 'completo', customName, prefs, UserState.getMode(), includeEx);
 
                 // Aggiorna UI e Ricarica contenuti
                 this.updateAIUI();
@@ -11049,11 +11071,11 @@
                         <h3 style="color:var(--neon-blue); margin-bottom:1.5rem;">Sfida: ${mod.title}</h3>
                         <div id="quiz-flow">
                             ${questions.map((q, qIdx) => `
-                                <div class="exercise-card">
+                                <div class="exercise-card" data-q-idx="${qIdx}">
                                     <div class="quiz-question">${qIdx + 1}. ${q.q}</div>
                                     <div class="quiz-options">
                                         ${q.o.map((opt, oIdx) => `
-                                            <button class="quiz-option" onclick="SPA.checkQuiz(this, ${q.a === oIdx}, '${q.expl.replace(/'/g, "\\'")}')">
+                                            <button class="quiz-option" data-idx="${oIdx}" onclick="SPA.checkQuiz(this, ${q.a === oIdx}, '${q.expl.replace(/'/g, "\\'")}', ${q.a})">
                                                 ${opt}
                                             </button>
                                         `).join('')}
@@ -11062,14 +11084,15 @@
                                 </div>
                             `).join('')}
                         </div>
-                        <div style="text-align:center; margin-top:2rem;">
-                            <button class="tui-btn" style="width:auto; padding:0.8rem 3rem;" onclick="SPA.closeExercise()">Torna all'Hub</button>
+                        <div style="text-align:center; margin-top:2rem; display:flex; justify-content:center; gap:1rem;">
+                            <button class="tui-btn" style="width:auto; padding:0.8rem 2rem; background:rgba(255,255,255,0.05);" onclick="SPA.openModuleExercise('${moduleId}')">🔄 Riprova tutto</button>
+                            <button class="tui-btn" style="width:auto; padding:0.8rem 2rem;" onclick="SPA.closeExercise()">Torna all'Hub</button>
                         </div>
                     </div>
                 `;
             },
 
-            checkQuiz(btn, isCorrect, explanation) {
+            checkQuiz(btn, isCorrect, explanation, correctIdx) {
                 const parent = btn.closest('.exercise-card');
                 const feedback = parent.querySelector('.quiz-feedback');
                 const options = parent.querySelectorAll('.quiz-option');
@@ -11078,11 +11101,15 @@
 
                 if (isCorrect) {
                     btn.classList.add('correct');
-                    feedback.innerHTML = `<strong>Corretto!</strong> ${explanation}`;
+                    feedback.innerHTML = `<strong>✅ Corretto!</strong> ${explanation}`;
                     feedback.className = 'quiz-feedback feedback-correct';
                 } else {
                     btn.classList.add('wrong');
-                    feedback.innerHTML = `<strong>Ops!</strong> ${explanation}`;
+                    // Evidenzia la risposta corretta
+                    const correctBtn = parent.querySelector(`.quiz-option[data-idx="${correctIdx}"]`);
+                    if (correctBtn) correctBtn.classList.add('correct-answer-highlight');
+
+                    feedback.innerHTML = `<strong>❌ Ops!</strong> ${explanation}`;
                     feedback.className = 'quiz-feedback feedback-wrong';
                 }
                 feedback.style.display = 'block';
