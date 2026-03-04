@@ -936,9 +936,11 @@
             background: rgba(0, 255, 85, 0.08);
         }
 
-        .quiz-option.wrong {
-            border-color: var(--error-red);
-            background: rgba(255, 51, 51, 0.08);
+        .quiz-option.correct-answer-highlight {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 85, 0.04);
+            box-shadow: 0 0 10px rgba(0, 255, 85, 0.2);
+            font-weight: 600;
         }
 
         .quiz-option.correct-answer-highlight {
@@ -1008,9 +1010,10 @@
         }
 
         .lib-idx-item:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.04);
+            color: var(--neon-blue);
+            background: rgba(0, 119, 255, 0.08);
             border-left-color: var(--neon-blue);
+            transform: translateX(4px);
         }
 
         #library-content {
@@ -1652,7 +1655,7 @@
          *  GENERATOR ENGINE (IA SIMULATION)
          * ============================ */
         const GeneratorEngine = {
-            analyze(prefs, role) {
+            analyze(prefs, role, mode) {
                 const p = (prefs + ' ' + role).toLowerCase();
                 const overrides = {
                     style: '',
@@ -1663,6 +1666,13 @@
                 if (p.includes('testo blu')) overrides.style = 'color: var(--neon-blue) !important;';
                 if (p.includes('testo verde')) overrides.style = 'color: var(--neon-green) !important;';
                 if (p.includes('testo rosso')) overrides.style = 'color: var(--error-red) !important;';
+
+                // Mode-based analysis
+                if (mode === 'Junior') {
+                    overrides.style += ' font-size: 1.1em;'; // Larger text for Junior
+                } else if (mode === 'Senior') {
+                    overrides.style += ' letter-spacing: 0.5px;'; // More formal look
+                }
 
                 // Word Detection: Bonus Modules
                 if (p.includes('sistema solare')) {
@@ -10645,7 +10655,7 @@
                         <h3>🤖 Percorso Generato: ${project.title}</h3>
                         <p style="color:var(--text-muted);font-size:0.95rem;">
                             Bentornato <strong>${project.userName || 'Studente'}</strong>. Ho preparato questo percorso basandomi sui tuoi obiettivi.
-                            <br><em>Modalità: ${mode === 'ruolo' ? `Ruolo (${role})` : 'Completo'} | Tono: ${tone}</em>
+                            <br><em>Modalità Studio: ${project.learningMode || 'Master'} | Ambito: ${mode === 'ruolo' ? `Ruolo (${role})` : 'Completo'}</em>
                         </p>
                     </div>
                 `;
@@ -10809,8 +10819,8 @@
                     const inlineRuolo = document.getElementById('inline-ruolo'); // Added for completeness
                     const inlineExercises = document.getElementById('inline-exercises'); // Added for completeness
 
-                    if (inlineAge) inlineAge.value = 25; // Default age
-                    if (inlineTone) inlineTone.value = 'formale'; // Default tone
+                    if (inlineAge) inlineAge.value = '';
+                    if (inlineTone) inlineTone.value = 'amichevole';
                     if (inlinePrefs) inlinePrefs.value = UserState.data.preferences || '';
                     if (inlineRuolo) inlineRuolo.value = UserState.data.role || '';
                     if (inlineExercises) inlineExercises.checked = UserState.data.exercises !== false;
@@ -10876,19 +10886,22 @@
             },
 
             openAIPathForm() {
-                // Se siamo già loggati, resetta il form e mostralo
                 const session = AuthManager.getSession();
                 if (!session) { AuthUI.openModal('login'); return; }
 
-                // Naviga al quadrante AI
                 this.navigate('home');
-                const quadAI = document.getElementById('quad-ai');
-                if (quadAI) {
-                    quadAI.scrollIntoView({ behavior: 'smooth' });
-                    // Forza visibilità del form
-                    document.getElementById('ai-inline-form').style.display = 'block';
-                    document.getElementById('ai-profile-status').style.display = 'none';
-                }
+
+                setTimeout(() => {
+                    const quadAI = document.getElementById('quad-ai');
+                    const form = document.getElementById('ai-inline-form');
+                    const status = document.getElementById('ai-profile-status');
+
+                    if (quadAI) {
+                        quadAI.scrollIntoView({ behavior: 'smooth' });
+                        if (form) form.style.display = 'block';
+                        if (status) status.style.display = 'none';
+                    }
+                }, 150);
             },
 
             switchMode(mode) {
@@ -10961,7 +10974,7 @@
                 err.textContent = '';
 
                 // SIMULAZIONE IA: Generazione Overrides
-                const aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '');
+                const aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '', UserState.getMode());
 
                 // Salvataggio stato (Rimosso age/tone persistenti)
                 UserState.save(isRuoloMode ? ruoloText : 'completo', customName, prefs, UserState.getMode(), includeEx);
@@ -10974,7 +10987,7 @@
                 const success = PrivateProjects.save({
                     title: isRuoloMode ? `Percorso ${ruoloText}` : `Corso Integrale`,
                     type: isRuoloMode ? `Ruolo: ${ruoloText}` : 'Completo',
-                    description: `Adattato per ${customName} (${age} anni).`,
+                    description: `Adattato per ${customName}.`,
                     userName: customName,
                     preferences: prefs,
                     courseMode: isRuoloMode ? 'ruolo' : 'completo',
@@ -11093,24 +11106,51 @@
             },
 
             checkQuiz(btn, isCorrect, explanation, correctIdx) {
-                const parent = btn.closest('.exercise-card');
+                const parent = btn.closest('.exercise-card') || btn.closest('.lab-box');
                 const feedback = parent.querySelector('.quiz-feedback');
                 const options = parent.querySelectorAll('.quiz-option');
 
-                options.forEach(opt => opt.disabled = true);
+                options.forEach(opt => {
+                    opt.disabled = true;
+                    opt.style.pointerEvents = 'none';
+                    opt.style.opacity = '0.6';
+                });
 
                 if (isCorrect) {
                     btn.classList.add('correct');
+                    btn.style.opacity = '1';
                     feedback.innerHTML = `<strong>✅ Corretto!</strong> ${explanation}`;
                     feedback.className = 'quiz-feedback feedback-correct';
                 } else {
                     btn.classList.add('wrong');
-                    // Evidenzia la risposta corretta
-                    const correctBtn = parent.querySelector(`.quiz-option[data-idx="${correctIdx}"]`);
-                    if (correctBtn) correctBtn.classList.add('correct-answer-highlight');
-
-                    feedback.innerHTML = `<strong>❌ Ops!</strong> ${explanation}`;
+                    btn.style.opacity = '1';
+                    const correctBtn = options[correctIdx] || Array.from(options).find(o => o.getAttribute('onclick')?.includes('true'));
+                    if (correctBtn) {
+                        correctBtn.classList.add('correct-answer-highlight');
+                        correctBtn.style.opacity = '1';
+                    }
+                    feedback.innerHTML = `<strong>❌ Errato.</strong> ${explanation}`;
                     feedback.className = 'quiz-feedback feedback-wrong';
+                }
+
+                if (!feedback.querySelector('.retry-btn')) {
+                    const r = document.createElement('button');
+                    r.className = 'tui-btn retry-btn';
+                    r.style.cssText = 'background:#222; border:1px solid #444; margin-top:1rem; padding:0.5rem 1rem; font-size:0.75rem; width:auto; display:inline-block;';
+                    r.innerHTML = '🔄 Riprova questa sezione';
+                    r.onclick = (e) => {
+                        e.stopPropagation();
+                        options.forEach(o => {
+                            o.disabled = false;
+                            o.style.pointerEvents = 'auto';
+                            o.style.opacity = '1';
+                            o.classList.remove('correct', 'wrong', 'correct-answer-highlight');
+                        });
+                        feedback.style.display = 'none';
+                        feedback.innerHTML = '';
+                    };
+                    feedback.appendChild(document.createElement('br'));
+                    feedback.appendChild(r);
                 }
                 feedback.style.display = 'block';
             },
@@ -11271,13 +11311,23 @@
             },
 
             scrollToModule(id) {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // Flash effect
-                    el.style.borderColor = 'var(--neon-blue)';
-                    setTimeout(() => el.style.borderColor = '', 1000);
+                // Se siamo in un'altra pagina, prima naviga a 'full-library'
+                const currentActive = document.querySelector('.section-view.active');
+                if (currentActive && currentActive.id !== 'full-library' && currentActive.id !== 'custom-project-view') {
+                    this.navigate('full-library');
                 }
+
+                setTimeout(() => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Flash effect
+                        el.classList.add('highlight-flash');
+                        setTimeout(() => el.classList.remove('highlight-flash'), 1500);
+                    } else {
+                        console.warn(`Modulo ${id} non trovato nel DOM.`);
+                    }
+                }, 50);
             },
 
             buildPath(dataKey, containerId) {
@@ -11384,24 +11434,21 @@
                         const qId = `quiz-${dataKey}-${modIdx}`;
                         const opts = mod.quiz.options.map((opt, i) => {
                             const isCorrect = i === mod.quiz.correctIndex;
-                            return `<button class="quiz-option" onclick="SPA.checkQuiz(this,${isCorrect},'${qId}-feedback')">${String.fromCharCode(65 + i)}. ${opt}</button>`;
+                            return `<button class="quiz-option" onclick="SPA.checkQuiz(this,${isCorrect},'${mod.quiz.explanation.replace(/'/g, "\\'")}',${mod.quiz.correctIndex})">${String.fromCharCode(64 + (i + 1))}. ${opt}</button>`;
                         }).join('');
                         labHtml = `
                             <div class="lab-box" id="container-${qId}">
                                 <h4 style="color:var(--text-main);margin-bottom:1rem;">🧪 ESERCITAZIONE</h4>
                                 <div class="quiz-question">${mod.quiz.question}</div>
                                 <div id="options-${qId}">${opts}</div>
-                                <div id="${qId}-feedback" class="quiz-feedback">
-                                    <strong>Responso:</strong> ${mod.quiz.explanation}
-                                    <button class="tui-btn" style="background:#333;margin-top:0.8rem;padding:0.4rem;" onclick="SPA.resetQuiz('${qId}')">🔄 Riprova</button>
-                                </div>
+                                <div id="${qId}-feedback" class="quiz-feedback" style="display:none;"></div>
                             </div>`;
                     }
 
                     const partBadge = mod.part ? `<span style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-left:0.5rem;">${mod.part}</span>` : '';
 
                     html += `
-                        <article class="module-container" id="${mod.id}" style="animation: fadeSlideUp 0.4s ease both; animation-delay: ${modIdx * 0.05}s;">
+                        <article class="module-container" id="${mod.id}" data-part="${mod.part}" style="animation: fadeSlideUp 0.4s ease both; animation-delay: ${modIdx * 0.05}s;">
                             <h2 class="module-title">${String(modIdx + 1).padStart(2, '0')} — ${mod.title}${partBadge}</h2>
                             ${juniorHtml}
                             ${fondamentiHtml}
@@ -11418,32 +11465,12 @@
             },
 
             resetQuiz(qId) {
+                // Funzione legacy mantenuta per compatibilità, ma ora integrata in checkQuiz enhanced
                 const fb = document.getElementById(qId + '-feedback');
-                const opts = document.getElementById('options-' + qId);
-                fb.style.display = 'none'; fb.className = 'quiz-feedback';
-                opts.querySelectorAll('.quiz-option').forEach(b => {
-                    b.classList.remove('correct', 'wrong'); b.style.pointerEvents = 'auto'; b.style.opacity = '1';
-                });
+                if (fb) fb.style.display = 'none';
             },
 
-            checkQuiz(btnEl, isCorrect, feedbackId) {
-                const parent = btnEl.parentElement;
-                parent.querySelectorAll('.quiz-option').forEach(b => {
-                    b.classList.remove('correct', 'wrong'); b.style.pointerEvents = 'none';
-                });
-                const fb = document.getElementById(feedbackId);
-                if (isCorrect) {
-                    btnEl.classList.add('correct');
-                    fb.className = 'quiz-feedback feedback-correct';
-                } else {
-                    btnEl.classList.add('wrong');
-                    fb.className = 'quiz-feedback feedback-wrong';
-                    parent.querySelectorAll('.quiz-option').forEach(b => {
-                        if (b.onclick.toString().includes('true')) { b.classList.add('correct'); b.style.opacity = '0.5'; }
-                    });
-                }
-                fb.style.display = 'block';
-            }
+            // Rimosso checkQuiz duplicato qui per usare quello in SPA logic
         };
 
         /** ============================
