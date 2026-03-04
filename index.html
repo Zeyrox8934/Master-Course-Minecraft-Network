@@ -1232,19 +1232,9 @@
                     <div class="nav-item" data-target="appendix">📚 Appendice & Glossario</div>
                 </li>
 
-                <div class="nav-section-title">Modalità Apprendimento</div>
-                <div class="sidebar-mode-toggles">
-                    <button class="mode-btn active" data-mode="Master" onclick="UserState.setMode('Master')">👑 Master
-                        Mode (Default)</button>
-                    <button class="mode-btn" data-mode="Senior" onclick="UserState.setMode('Senior')">🎖️ Senior Mode
-                        (Avanzato)</button>
-                    <button class="mode-btn" data-mode="Junior" onclick="UserState.setMode('Junior')">🧒 Junior Mode
-                        (Semplice)</button>
-                </div>
-
-                <div class="nav-section-title">Progetti & Cronologia</div>
+                <div class="nav-section-title">Navigazione Veloce</div>
                 <li>
-                    <div class="nav-item" onclick="SPA.navigate('home')">📂 I Miei Progetti</div>
+                    <div class="nav-item" onclick="SPA.navigate('home')">📂 Dashboard & Progetti</div>
                 </li>
                 <div class="sidebar-recent-list" id="sidebar-recent-list">
                     <!-- Dinamico -->
@@ -1294,12 +1284,39 @@
                             <div class="lock-icon">🔒</div>
                             <p>Accedi per accedere ai tuoi Progetti Privati</p>
                         </div>
-                        <h3><span style="font-size:1.4rem">🔐</span> I Miei Progetti</h3>
+                        <h3><span style="font-size:1.4rem">🔐</span> I Miei Progetti & Modalità</h3>
+
+                        <!-- NEW: Learning Mode selection moved here -->
+                        <div
+                            style="margin-bottom:1.5rem; padding:1rem; background:rgba(255,255,255,0.03); border-radius:10px; border:1px solid var(--bg-border);">
+                            <h4
+                                style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:0.8rem;">
+                                Scegli Modalità Studio</h4>
+                            <div class="sidebar-mode-toggles"
+                                style="margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
+                                <button class="mode-btn active" data-mode="Master" onclick="UserState.setMode('Master')"
+                                    style="font-size:0.7rem; padding:0.4rem; justify-content:center;">👑 Master</button>
+                                <button class="mode-btn" data-mode="Senior" onclick="UserState.setMode('Senior')"
+                                    style="font-size:0.7rem; padding:0.4rem; justify-content:center;">🎖️
+                                    Senior</button>
+                                <button class="mode-btn" data-mode="Junior" onclick="UserState.setMode('Junior')"
+                                    style="font-size:0.7rem; padding:0.4rem; justify-content:center;">🧒 Junior</button>
+                            </div>
+                        </div>
+
                         <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.88rem;">Percorsi personalizzati
                             (Scadenza: 30gg).</p>
+
                         <div id="private-projects-list">
                             <p style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">Nessun progetto
                                 salvato.</p>
+                        </div>
+
+                        <!-- NEW: Create Custom Path Button -->
+                        <div style="margin-top:1rem;">
+                            <button class="tui-btn" onclick="SPA.openAIPathForm()"
+                                style="background:var(--neon-purple); border:1px solid var(--neon-purple); font-size:0.85rem; padding:0.6rem;">✨
+                                CREA PERCORSO AI</button>
                         </div>
                         <div style="margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--bg-border);">
                             <h4 style="margin-bottom:0.6rem;color:var(--text-muted);font-size:0.85rem;">🕒 Visti di
@@ -1625,6 +1642,48 @@
         };
 
         /** ============================
+         *  GENERATOR ENGINE (IA SIMULATION)
+         * ============================ */
+        const GeneratorEngine = {
+            analyze(prefs, role) {
+                const p = (prefs + ' ' + role).toLowerCase();
+                const overrides = {
+                    style: '',
+                    bonusModules: []
+                };
+
+                // Word Detection: Styling
+                if (p.includes('testo blu')) overrides.style = 'color: var(--neon-blue) !important;';
+                if (p.includes('testo verde')) overrides.style = 'color: var(--neon-green) !important;';
+                if (p.includes('testo rosso')) overrides.style = 'color: var(--error-red) !important;';
+
+                // Word Detection: Bonus Modules
+                if (p.includes('sistema solare')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-solar',
+                        title: '🚀 MODULO SPECIALE: IL SISTEMA SOLARE',
+                        part: 'Astronomia Digitale',
+                        fondamenti: 'Il Sistema Solare è il nostro quartiere nello spazio. Composto dal Sole e da tutto ciò che vi orbita intorno: 8 pianeti, decine di lune, asteroidi e comete.',
+                        pratica: 'In Minecraft, puoi costruire modelli in scala planetaria usando i blocchi di oro per il sole e diverse ossidiane per i pianeti oscuri.',
+                        junior: 'Immagina il Sole come una grande lampadina al centro di una stanza e i pianeti come palline che gli girano attorno.'
+                    });
+                }
+                if (p.includes('intelligenza artificiale') || p.includes('ia ')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-ai',
+                        title: '🧠 MODULO SPECIALE: INTRECCIO NEURALE (IA)',
+                        part: 'Tecnologie Emergenti',
+                        fondamenti: 'Le Reti Neurali artificiali imitano il modo in cui i neuroni nel cervello umano si scambiano segnali per imparare dai dati.',
+                        pratica: 'I bot moderni usano motori decisionali simili a alberi logici complessi per simulare comportamenti "intelligenti".',
+                        junior: 'L\'IA è come insegnare a un robot a riconoscere i gatti guardando migliaia di foto di gatti.'
+                    });
+                }
+
+                return overrides;
+            }
+        };
+
+        /** ============================
          *  USER STATE (PROFILO AI & MODALITÀ)
          * ============================ */
         const UserState = {
@@ -1671,16 +1730,7 @@
                 return TUI_Storage.get('projects') || [];
             },
             canCreate() {
-                const currentProjects = this.getAll();
-                if (currentProjects.length >= 3) {
-                    return { allowed: false, reason: "Hai raggiunto il limite di 3 progetti archiviati. Eliminane uno per crearne di nuovi." };
-                }
-                const now = new Date();
-                const key = `creates_${now.getFullYear()}_${now.getMonth()}`;
-                const monthlyCount = parseInt(TUI_Storage.get(key) || '0');
-                if (monthlyCount >= 5) {
-                    return { allowed: false, reason: "Hai raggiunto il limite mensile di 5 nuovi progetti. Riprova il mese prossimo." };
-                }
+                // IA GRATUITA: Nessun limite imposto
                 return { allowed: true };
             },
             incrementMonthlyCounter() {
@@ -1735,7 +1785,7 @@
             },
             save(project) {
                 const items = this.getAll();
-                if (items.length >= 3) return false;
+                // IA GRATUITA: Rimosso limite di 3
                 items.unshift({ ...project, archivedAt: Date.now() });
                 TUI_Storage.set('archive', items);
                 return true;
@@ -10468,9 +10518,9 @@
                 const indexList = document.getElementById('library-index-list');
                 if (indexList) {
                     indexList.innerHTML = COURSE_DATA.map(m =>
-                        `<a class="lib-idx-item" onclick="document.getElementById('${m.id}').scrollIntoView({behavior:'smooth', block:'start'})">
+                        `<span class="lib-idx-item" onclick="SPA.scrollToModule('${m.id}')">
                             ${m.title.replace(/^- /, '')}
-                        </a>`
+                        </span>`
                     ).join('');
                 }
             },
@@ -10526,6 +10576,10 @@
                 const mode = project.courseMode || 'completo';
                 const role = project.role || '';
 
+                // 0. AI OVERRIDES (Stili e Bonus)
+                const overrides = project.aiOverrides || { style: '', bonusModules: [] };
+                const customStyle = overrides.style ? `style="${overrides.style}"` : '';
+
                 // 1. MODULI JUNIOR BASE (Se Junior < 14)
                 let juniorBaseHtml = '';
                 if (isJunior) {
@@ -10535,7 +10589,7 @@
                         { t: 'BASI DI INTERNET', d: 'Pacchetti, IP e come viaggiano i dati.' }
                     ];
                     juniorBaseHtml = `
-                        <div class="module-container" style="border-left:4px solid var(--neon-blue);">
+                        <div class="module-container" ${customStyle} style="border-left:4px solid var(--neon-blue);">
                             <h3>🧒 Fondamenta Junior: I Primi Passi</h3>
                             <div class="dictionary-list" style="margin-top:1rem;">
                                 ${baseMods.map(m => `<div class="dict-item"><strong>${m.t}:</strong> ${m.d}</div>`).join('')}
@@ -10543,6 +10597,12 @@
                             <p style="font-size:0.85rem;margin-top:0.8rem;color:var(--text-muted);">Questi moduli sono stati aggiunti automaticamente per la tua fascia d'età.</p>
                         </div>
                     `;
+                }
+
+                // 1.5 MODULI BONUS IA
+                let bonusHtml = '';
+                if (overrides.bonusModules && overrides.bonusModules.length > 0) {
+                    bonusHtml = overrides.bonusModules.map(bm => this.renderModule(bm, isJunior, tone)).join('');
                 }
 
                 // 2. FILTRAGGIO MODULI (Basato su Mode/Ruolo ed Età)
@@ -10583,7 +10643,15 @@
                     </div>
                 `;
 
-                container.innerHTML = intro + juniorBaseHtml + displayModules.map(m => this.renderModule(m, isJunior, tone)).join('');
+                container.innerHTML = intro + juniorBaseHtml + bonusHtml + displayModules.map(m => this.renderModule(m, isJunior, tone)).join('');
+
+                // Applica lo stile custom a tutti i moduli del contenitore se presente
+                if (overrides.style) {
+                    const allMods = container.querySelectorAll('.module-container');
+                    allMods.forEach(m => {
+                        m.style.color = overrides.style.split(':')[1].replace(' !important;', '').trim();
+                    });
+                }
             }
         };
 
@@ -10769,6 +10837,8 @@
                 });
                 // Ricarica contenuti se cambiamo modalità globalmente
                 this.renderAllContent();
+                // Aggiorna anche il profilo AI status
+                this.updateAIUI();
             },
 
             renderAllContent() {
@@ -10868,12 +10938,8 @@
 
                 err.textContent = '';
 
-                // Controlla limite mensile
-                const limitCheck = PrivateProjects.canCreate();
-                if (!limitCheck.allowed) {
-                    err.textContent = '🚫 ' + limitCheck.reason;
-                    return;
-                }
+                // SIMULAZIONE IA: Generazione Overrides
+                const aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '');
 
                 // Salvataggio stato con modalità corrente e preferenza esercizi
                 UserState.save(age, isRuoloMode ? ruoloText : 'completo', tone, customName, prefs, UserState.getMode(), includeEx);
@@ -10894,7 +10960,8 @@
                     age: age,
                     tone: tone,
                     exercises: includeEx,
-                    learningMode: UserState.getMode()
+                    learningMode: UserState.getMode(),
+                    aiOverrides: aiOverrides
                 });
 
                 if (success) {
