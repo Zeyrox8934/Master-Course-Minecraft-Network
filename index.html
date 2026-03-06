@@ -1126,6 +1126,140 @@
                 max-height: none;
             }
         }
+
+        @keyframes floatFallback {
+            0% {
+                transform: perspective(1000px) translateY(0px) rotateX(0deg) rotateY(0deg);
+            }
+
+            50% {
+                transform: perspective(1000px) translateY(-5px) rotateX(2deg) rotateY(-2deg);
+            }
+
+            100% {
+                transform: perspective(1000px) translateY(0px) rotateX(0deg) rotateY(0deg);
+            }
+        }
+
+        .floating-fallback {
+            animation: floatFallback 6s ease-in-out infinite;
+        }
+
+        /* ============================
+         *  MOBILE-ONLY UI REVOLUTION
+         * ============================ */
+        @media (max-width: 768px),
+        (hover: none) and (pointer: coarse) {
+            html {
+                font-size: 16px !important;
+                /* Prevents iOS auto-zoom */
+            }
+
+            body {
+                padding-bottom: 70px;
+            }
+
+            #sidebar {
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                left: 0;
+                width: 100%;
+                height: 65px;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 0;
+                z-index: 9999;
+                border-right: none;
+                border-top: 1px solid var(--bg-border);
+            }
+
+            .nav-list {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-around;
+                padding: 0;
+                margin: 0;
+            }
+
+            .nav-section-title,
+            .brand,
+            .btn-home,
+            .sidebar-recent-list {
+                display: none !important;
+            }
+
+            .nav-item {
+                padding: 10px;
+                min-width: 48px;
+                min-height: 48px;
+                /* Thumb-friendly tassativo */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 0;
+                /* Nascondi testo lungo, lascia solo icona */
+            }
+
+            .nav-item::before {
+                font-size: 1.6rem;
+            }
+
+            .nav-item[data-target="home"]::before {
+                content: "🏠";
+            }
+
+            .nav-item[data-target="path-minecraft"]::before {
+                content: "🟩";
+            }
+
+            .nav-item[data-target="path-devops"]::before {
+                content: "🟦";
+            }
+
+            .nav-item[data-target="path-software"]::before {
+                content: "🟪";
+            }
+
+            .nav-item[data-target="full-library"]::before {
+                content: "📚";
+            }
+
+            .nav-item[data-target="appendix"]::before {
+                content: "📖";
+            }
+
+            #content {
+                margin-left: 0 !important;
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .tui-btn,
+            .btn-auth {
+                min-height: 48px;
+                /* Thumb-friendly tassativo */
+                min-width: 48px;
+                padding: 0.8rem;
+            }
+
+            .dash-quad {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+                /* Prevents iOS auto-zoom */
+            }
+
+            /* Riposiziona toast per non sovrapporre nav bar bottom */
+            #toast-container {
+                bottom: 80px !important;
+            }
+        }
     </style>
 </head>
 
@@ -1384,8 +1518,47 @@
                                     <button id="mode-btn-ruolo" onclick="SPA.switchMode('ruolo')">🎯 PER RUOLO</button>
                                 </div>
                                 <div id="ruolo-input-wrap" style="display:none;margin-top:0.5rem;">
-                                    <input type="text" id="inline-ruolo" class="tui-input"
-                                        placeholder="Es. Developer, SysAdmin, Network Owner..." style="padding:0.6rem;">
+                                    <select id="inline-ruolo" class="tui-select" style="padding:0.6rem;">
+                                        <option value="" disabled selected>Seleziona un ruolo...</option>
+                                        <option value="Minecraft Architect">🛠️ Minecraft Architect (System & Network)
+                                        </option>
+                                        <option value="Java Backend Developer">💻 Java Backend Developer</option>
+                                        <option value="Linux SysAdmin">🐧 Linux SysAdmin</option>
+                                        <option value="DevOps Engineer">♾️ DevOps Engineer</option>
+                                        <option value="Cybersecurity Analyst">🛡️ Cybersecurity Analyst</option>
+                                        <option value="Network Specialist">🌐 Network Specialist (TCP/UDP)</option>
+                                        <option value="Cloud AI Architect">☁️ Cloud AI Architect</option>
+                                        <option value="Plugin Developer">🧩 Plugin Developer (Paper/Spigot)</option>
+                                        <option value="Full-Stack Web Dev">🕸️ Full-Stack Web Dev</option>
+                                        <option value="Database Administrator">🗄️ Database Administrator</option>
+                                        <option value="Discord Integration Expert">🤖 Discord Integration Expert
+                                        </option>
+                                        <option value="Automation Specialist">⚡ Automation Specialist</option>
+                                        <option value="Hardware Infrastructure Tech">🔌 Hardware Infrastructure Tech
+                                        </option>
+                                        <option value="Security Auditor">🔍 Security Auditor (Pentest)</option>
+                                        <option value="Technical Community Manager">👥 Technical Community Manager
+                                        </option>
+                                        <option value="Performance Optimization Expert">🚀 Performance Optimization
+                                            Expert</option>
+                                        <option value="Virtualization Specialist">📦 Virtualization Specialist (Docker)
+                                        </option>
+                                        <option value="Game Logic Designer">🧠 Game Logic Designer</option>
+                                        <option value="Content Creator">🎥 Content Creator / Streamer</option>
+                                        <option value="Systems Architect">🏗️ Systems Architect</option>
+                                        <option value="Frontend UI/UX Dev">🎨 Frontend UI/UX Dev</option>
+                                        <option value="Data Engineer">📊 Data Engineer</option>
+                                        <option value="Machine Learning Integrator">🤖 Machine Learning Integrator
+                                        </option>
+                                        <option value="Server Administrator">🖥️ Server Administrator</option>
+                                        <option value="Network Security Officer">🔐 Network Security Officer</option>
+                                        <option value="Technical Project Manager">📅 Technical Project Manager</option>
+                                        <option value="Quality Assurance Tester">🧪 Quality Assurance Tester</option>
+                                        <option value="Graphics & Rendering Expert">🖌️ Graphics & Rendering Expert
+                                        </option>
+                                        <option value="Robotics & IoT Engineer">🤖 Robotics & IoT Engineer</option>
+                                        <option value="Elitario">👑 Elitario (Master of All)</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="input-group" style="margin-bottom:0.9rem;">
@@ -1693,6 +1866,78 @@
                         fondamenti: 'Le Reti Neurali artificiali imitano il modo in cui i neuroni nel cervello umano si scambiano segnali per imparare dai dati.',
                         pratica: 'I bot moderni usano motori decisionali simili a alberi logici complessi per simulare comportamenti "intelligenti".',
                         junior: 'L\'IA è come insegnare a un robot a riconoscere i gatti guardando migliaia di foto di gatti.'
+                    });
+                }
+
+                // --- CONTENT ENRICHMENT ---
+
+                // 1. SISTEMA SOLARE (Expanded)
+                if (p.includes('sistema solare') || p.includes('stelle') || p.includes('pianeti')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-solar-deep',
+                        title: '🌌 COSMOLOGIA: IL SISTEMA SOLARE E OLTRE',
+                        part: 'Astronomia & Fisica',
+                        fondamenti: `Il Sistema Solare non è solo un insieme di pianeti, ma una complessa danza gravitazionale guidata dal Sole, che contiene il 99,8% della massa totale. I pianeti interni (Mercurio, Venere, Terra, Marte) sono rocciosi e densi, nati dai resti solidi della nebulosa primordiale. I giganti gassosi (Giove, Saturno) e quelli ghiacciati (Urano, Nettuno) dominano le zone esterne, ricchi di idrogeno, elio e ghiacci volatili. 
+                        
+                        Oltre Nettuno, la Fascia di Kuiper ospita pianeti nani come Plutone, mentre la Nube di Oort segna il confine estremo dell'influenza solare. Comprendere la struttura del nostro sistema significa comprendere la storia stessa della materia nel nostro angolo di galassia. Ogni corpo celeste, dai piccoli asteroidi alle lune ghiacciate di Giove (come Europa, che potrebbe ospitare oceani liquidi), racconta un capitolo della nostra evoluzione cosmica.`,
+                        pratica: 'Utilizzando Minecraft, è possibile simulare le orbite attraverso plugin di calcolo vettoriale o semplicemente costruendo modelli in scala 1:1,000,000 dove 1 blocco rappresenta 1000km di diametro planetario.',
+                        junior: 'Immagina il Sole come una grande lampada al centro di un giardino: i pianeti sono bambini che gli girano attorno a distanze diverse. Alcuni sono piccoli e caldi, altri sono giganti e fatti di nuvole.'
+                    });
+                }
+
+                // 2. NETWORKING & INFRASTRUTTURA
+                if (p.includes('networking') || p.includes('ip ') || p.includes('dns') || p.includes('server')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-net-deep',
+                        title: '🌐 ARCHITETTURA DI RETE E PROTOCOLLI TCP/IP',
+                        part: 'Networking & Security',
+                        fondamenti: `Ogni comunicazione digitale moderna si basa sul modello ISO/OSI o sulla suite TCP/IP. Il protocollo IP (Internet Protocol) è responsabile dell'indirizzamento e dell'instradamento dei pacchetti attraverso nodi multipli. Il trasporto affidabile è garantito dal TCP (Transmission Control Protocol), che gestisce la ri-trasmissione in caso di perdita e il controllo di congestione.
+                        
+                        I record DNS (Domain Name System) fungono da elenco telefonico globale, traducendo nomi mnemonici in indirizzi IP numerici. Comprendere come funzionano i tunnel, i proxy e le reti private (VPC) è fondamentale per proteggere qualsiasi infrastruttura server. La latenza e il throughput non sono solo numeri, ma il risultato dell'efficienza dei router e della qualità dei collegamenti in fibra ottica intercontinentali.`,
+                        pratica: 'Configura un firewall iptables o gestisci le tabelle di routing in un ambiente Linux per isolare i tuoi database server dai bot esterni.',
+                        junior: 'Internet è come un gigantesco sistema di posta velocissimo. Ogni pacchetto ha un indirizzo (IP) e il postino (Router) sa esattamente come consegnarlo ovunque nel mondo.'
+                    });
+                }
+
+                // 3. CYBERSECURITY
+                if (p.includes('security') || p.includes('hacking') || p.includes('sicurezza') || p.includes('protezione')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-cyber-deep',
+                        title: '🛡️ DIFESA DIGITALE E CRYPTOGRAPHY',
+                        part: 'Cybersecurity',
+                        fondamenti: `La sicurezza informatica non riguarda solo le password, ma l'intero perimetro d'attacco. La crittografia asimmetrica (RSA, ECC) permette lo scambio sicuro di chiavi su canali insicuri tramite l'uso di chiavi pubbliche e private. L'Hashing (SHA-256) garantisce l'integrità dei dati, assicurando che non siano stati alterati in transito.
+                        
+                        Le minacce moderne includono attacchi DDoS (Distributed Denial of Service), SQL Injection e Ransomware. Una solida strategia di difesa richiede un approccio "Zero Trust", dove ogni richiesta viene verificata indipendentemente dalla sua origine interna o esterna. La gestione dei permessi (RBAC) e il logging costante degli accessi sono i pilastri della resilienza infrastrutturale.`,
+                        pratica: 'Implementa chiavi SSH per l\'accesso al server e disabilita l\'autenticazione tramite password. Usa Fail2Ban per bloccare tentativi di brute-force automatici.',
+                        junior: 'La cybersecurity è come mettere un lucchetto magico al tuo castello digitale. Solo chi ha la chiave giusta può entrare, e le guardie (Firewall) controllano chiunque passi dal ponte levatoio.'
+                    });
+                }
+
+                // 4. PROGRAMMAZIONE JAVA & ALGORITMI
+                if (p.includes('java') || p.includes('coding') || p.includes('sviluppo') || p.includes('software')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-java-deep',
+                        title: '☕ SVILUPPO AVANZATO: JAVA & OOP',
+                        part: 'Software Engineering',
+                        fondamenti: `Java è un linguaggio orientato agli oggetti (OOP) basato sulla Java Virtual Machine (JVM), che permette l'esecuzione del codice su qualsiasi architettura (Write Once, Run Anywhere). I concetti fondamentali come l'Ereditarietà, l'Incapsulamento e il Polimorfismo permettono di creare sistemi software modulari, scalabili e facilmente manutenibili.
+                        
+                        La gestione della memoria tramite Garbage Collection solleva il programmatore dal compito manuale di allocazione e deallocazione, riducendo i memory leak. Le collezioni (Lists, Maps, Sets) e gli Stream API moderni offrono strumenti potenti per la manipolazione dei dati in modo funzionale e dichiarativo. Comprendere il ciclo di vita degli oggetti e la gestione delle eccezioni è vitale per sviluppare applicazioni enterprise robuste.`,
+                        pratica: 'Crea classi strutturate per gestire entità complesse nel tuo plugin Minecraft. Implementa interfacce per definire comportamenti comuni e usa i Generics per scrivere codice riutilizzabile e Type-Safe.',
+                        junior: 'Programmare in Java è come dare dei comandi super precisi a un robot. Usiamo delle "classi" che sono come dei progetti di costruzione per creare tutto quello che vogliamo nel mondo digitale.'
+                    });
+                }
+
+                // 5. HARDWARE & ARCHITETTURA CALCOLATORI
+                if (p.includes('hardware') || p.includes('cpu') || p.includes('ram') || p.includes('fisico')) {
+                    overrides.bonusModules.push({
+                        id: 'bonus-hw-deep',
+                        title: '📟 ARCHITETTURA HARDWARE E SISTEMI FISICI',
+                        part: 'Hardware & OS',
+                        fondamenti: `Il cuore di ogni sistema è la CPU (Central Processing Unit), che esegue cicli di istruzioni a miliardi di volte al secondo tramite la ALU (Arithmetic Logic Unit). La memoria RAM (Random Access Memory) funge da spazio di lavoro volatile, mentre lo storage persistente (SSD/NVMe) conserva i dati a lungo termine tramite memorie flash ad alta velocità.
+                        
+                        Il Northbridge e il Southbridge coordinano le comunicazioni tra processore, memoria e periferiche esterne tramite bus di sistema come il PCIe. Comprendere l'architettura x86_64 vs ARM e il ruolo del BIOS/UEFI è essenziale per ottimizzare le prestazioni hardware e diagnosticare guasti fisici o colli di bottiglia energetici nelle infrastrutture server moderne.`,
+                        pratica: 'Monitora la temperatura della CPU e l\'utilizzo della memoria tramite il comando "htop". Ottimizza i parametri di avvio del BIOS per massimizzare il throughput dei dischi RAID.',
+                        junior: 'L\'hardware sono le parti del computer che puoi toccare. La CPU è il cervello che pensa, la RAM è la memoria a breve termine per le cose che stai facendo ora, e il disco rigido è lo zaino dove tieni i tuoi file.'
                     });
                 }
 
@@ -10920,9 +11165,26 @@
                 }
             },
 
-            submitInlineProfile() {
+            // Frontend State per Anti-Spam
+            spamCount: 0,
+            lockoutTime: 0,
+            lastMsg: '',
+
+            async submitInlineProfile() {
                 const session = AuthManager.getSession();
                 if (!session) { AuthUI.openModal('login'); return; }
+
+                // LOGICA ANTI-SPAM FRONTEND
+                const now = Date.now();
+                const err = document.getElementById('inline-ai-error');
+                const submitBtn = document.querySelector('#ai-inline-form .tui-btn');
+
+                if (this.lockoutTime && now < this.lockoutTime) {
+                    const secLeft = Math.ceil((this.lockoutTime - now) / 1000);
+                    err.textContent = `⏳ Sistema bloccato. Riprova tra ${secLeft} secondi.`;
+                    err.style.color = 'var(--error-red)';
+                    return;
+                }
 
                 const ageInput = document.getElementById('inline-age');
                 const toneInput = document.getElementById('inline-tone');
@@ -10934,47 +11196,148 @@
                 const tone = toneInput.value;
                 const prefs = prefsInput ? prefsInput.value.trim() : '';
                 const includeEx = exerciseCheck ? exerciseCheck.checked : true;
-                const err = document.getElementById('inline-ai-error');
 
                 // Determina modalità
                 const isRuoloMode = document.getElementById('mode-btn-ruolo')?.classList.contains('active');
                 const ruoloText = ruoloInput ? ruoloInput.value.trim() : '';
 
+                // Anti-Spam (ripetizione / troppo corto)
+                if (prefs.length > 0 && prefs.length < 5) {
+                    err.textContent = "⚙️ Descrivi l'obiettivo in modo più dettagliato.";
+                    err.style.color = 'var(--error-red)';
+                    return;
+                }
+                if (prefs === this.lastMsg && prefs !== '') {
+                    err.textContent = "♻️ Hai già inviato questa richiesta. Modifica i parametri.";
+                    err.style.color = 'var(--error-red)';
+                    return;
+                }
+                this.lastMsg = prefs;
+
                 // Validazione Età
                 if (!age || age < 8 || age > 99) {
                     err.textContent = "Inserisci un'età valida (8-99).";
-                    return;
-                }
-
-                // SAFETY FILTER AVANZATO
-                const forbiddenWords = [
-                    'porno', 'pornografia', 'sesso', 'nudo', 'uccidere', 'ammazzare',
-                    'assassinare', 'droga', 'cocaina', 'eroina', 'bomba', 'esplosivo',
-                    'hackerare', 'rubare', 'stronzo', 'cazzo', 'vaffanculo', 'merda',
-                    'stupido', 'idiota', 'fottiti', 'razzismo', 'terrorismo'
-                ];
-                const combined = (prefs + ' ' + ruoloText).toLowerCase();
-                const isSenseless = combined.trim().length > 3 && /^[^a-z]+$/i.test(combined.replace(/\s/g, ''));
-                if (forbiddenWords.some(w => combined.includes(w)) || isSenseless) {
-                    err.textContent = '⛔ Input non valido: rispetta il rigore scientifico del Trattato.';
+                    err.style.color = 'var(--error-red)';
                     return;
                 }
 
                 // Validazione modalità RUOLO
                 if (isRuoloMode && !ruoloText) {
-                    err.textContent = 'Specifica un ruolo (es. Developer, SysAdmin, Network Owner).';
+                    err.textContent = '⛔ Seleziona un ruolo per generare il percorso specifico.';
+                    err.style.color = 'var(--error-red)';
                     return;
                 }
 
-                // Estrazione Nome ("Chiamami Leo")
+                // Estrazione Nome
                 let customName = session.name;
                 const nameMatch = prefs.match(/(?:chiamami|nome è|sono|mi chiamo)\s+([a-zA-Z]+)/i);
                 if (nameMatch && nameMatch[1]) customName = nameMatch[1];
 
-                err.textContent = '';
+                // SISTEMA DI CARICAMENTO AVANZATO
+                if (submitBtn) submitBtn.disabled = true;
+                err.style.color = 'var(--neon-blue)';
 
-                // SIMULAZIONE IA: Generazione Overrides
-                const aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '', UserState.getMode());
+                // Overlay "carino"
+                let loaderHtml = document.getElementById('ai-advanced-loader');
+                if (!loaderHtml) {
+                    loaderHtml = document.createElement('div');
+                    loaderHtml.id = 'ai-advanced-loader';
+                    loaderHtml.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(5,5,16,0.85);backdrop-filter:blur(8px);z-index:999999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:"Space Mono",monospace;';
+                    document.body.appendChild(loaderHtml);
+                }
+                loaderHtml.style.display = 'flex';
+
+                const messages = [
+                    "Accesso Sicuro al Trattato di Ingegneria...",
+                    "Analisi dei parametri in corso...",
+                    isRuoloMode ? `Configurazione per il ruolo ${ruoloText}...` : "Estrazione della conoscenza totale...",
+                    "Costruzione della rete neuronale didattica...",
+                    "Adattamento della difficoltà per il livello scelto...",
+                    "Fase terminale: generazione moduli scientifici...",
+                    "Ancora pochi istanti..."
+                ];
+
+                loaderHtml.innerHTML = `
+                    <div class="loader-spinner" style="margin-bottom:20px;width:70px;height:70px;border-top-color:var(--neon-blue);"></div>
+                    <div id="ai-loading-text" style="font-size:1.1rem;text-align:center;color:var(--neon-blue);animation:pulse 1.5s infinite;">Avvio connettività Core IA...</div>
+                `;
+
+                let msgIndex = 0;
+                const msgInterval = setInterval(() => {
+                    const textEl = document.getElementById('ai-loading-text');
+                    if (textEl && msgIndex < messages.length) {
+                        textEl.textContent = messages[msgIndex];
+                        msgIndex++;
+                    }
+                }, 1500);
+
+                let aiOverrides = { style: '', bonusModules: [] };
+
+                // API FETCH AL BACKEND PYTHON (SU RENDER)
+                try {
+                    // Impostiamo un timer minimo di 3.5 sec per far godere l'UX
+                    const startTime = Date.now();
+
+                    const response = await fetch('https://tui-backend-ia.onrender.com/generate-course', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ age, role: ruoloText, prefs })
+                    });
+
+                    const elapsed = Date.now() - startTime;
+                    if (elapsed < 3500) {
+                        await new Promise(resolve => setTimeout(resolve, 3500 - elapsed));
+                    }
+
+                    if (response.status === 403) {
+                        const errData = await response.json();
+                        // GESTIONE ERRORI 403 (PopUP di Sicurezza)
+                        alert(`🚨 ALLARME SICUREZZA T.U.I.\n\n${errData.error || 'Accesso Negato dal Guardrail Semantico.'}\n\nLa richiesta è stata intercettata e neutralizzata.`);
+
+                        this.spamCount++;
+                        if (this.spamCount >= 3) {
+                            this.lockoutTime = Date.now() + 60000; // 60 secondi
+                            err.textContent = '❌ Profilo bloccato per 60 secondi per motivi di sicurezza o spam.';
+                            this.spamCount = 0;
+                        } else {
+                            err.textContent = `⛔ Richiesta rigettata. (Tentativo ${this.spamCount}/3)`;
+                        }
+                        err.style.color = 'var(--error-red)';
+                        throw new Error("403_GUARDRAIL");
+                    }
+
+                    if (!response.ok) throw new Error("Backend not ok or unreachable");
+
+                    const generatedModule = await response.json();
+
+                    if (generatedModule.id) {
+                        aiOverrides.bonusModules.push(generatedModule);
+                    } else if (generatedModule.bonusModules) {
+                        aiOverrides = generatedModule;
+                    }
+
+                    this.spamCount = 0; // reset
+                    err.textContent = '';
+                } catch (e) {
+                    if (e.message !== "403_GUARDRAIL") {
+                        console.warn("Backend API irraggiungibile. Fallback al simulatore locale.", e);
+                        err.textContent = 'Core AI remoto offline. Fallback locale attivato.';
+                        err.style.color = 'var(--text-muted)';
+                        setTimeout(() => err.textContent = '', 2500);
+                        aiOverrides = GeneratorEngine.analyze(prefs, isRuoloMode ? ruoloText : '', UserState.getMode());
+                    } else {
+                        // Se è stato generato dal 403, passiamo oltre (il codice UI e il return bloccano il flow dopo questo blocco try/catch)
+                    }
+                } finally {
+                    clearInterval(msgInterval);
+                    if (loaderHtml) loaderHtml.style.display = 'none';
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+
+                // Se è scattato il lockout o un errore Guardrail non andiamo avanti
+                if (err.textContent && err.style.color === 'var(--error-red)') {
+                    return;
+                }
 
                 // Salvataggio stato (Rimosso age/tone persistenti)
                 UserState.save(isRuoloMode ? ruoloText : 'completo', customName, prefs, UserState.getMode(), includeEx);
@@ -11509,9 +11872,96 @@
             }
         };
 
+        /** ============================
+         *  PHYSICS & SENSORS ENGINE
+         * ============================ */
+        const PhysicsEngine = {
+            active: false,
+            init() {
+                if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // Variante iOS 13+ (Richiede permesso esplicito)
+                    this.createPermissionButton();
+                    this.applyFallback();
+                } else if (window.DeviceOrientationEvent) {
+                    // Non-iOS or older iOS
+                    window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                    this.active = true;
+                    // Start checking if sensors are actually transmitting data
+                    this.hasSensors = false;
+                    setTimeout(() => {
+                        if (!this.hasSensors) this.applyFallback();
+                    }, 1000);
+                } else {
+                    this.applyFallback();
+                }
+            },
+            applyFallback() {
+                // Se i sensori non sono disponibili o bloccati, applica animazione di "respiro" / floating
+                const targets = document.querySelectorAll('.module-container, .dash-quad, .lib-idx-item');
+                targets.forEach(el => {
+                    el.classList.add('floating-fallback');
+                });
+            },
+            removeFallback() {
+                const targets = document.querySelectorAll('.module-container, .dash-quad, .lib-idx-item');
+                targets.forEach(el => {
+                    el.classList.remove('floating-fallback');
+                });
+            },
+            createPermissionButton() {
+                // Legato all'azione dell'utente per iOS
+                const btnLog = document.getElementById('tab-login');
+                const btnReg = document.getElementById('tab-register');
+
+                const reqPerm = () => {
+                    this.requestPermission();
+                };
+                if (btnLog) btnLog.addEventListener('click', reqPerm, { once: true });
+                if (btnReg) btnReg.addEventListener('click', reqPerm, { once: true });
+            },
+            requestPermission() {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                        this.active = true;
+                        this.removeFallback(); // Remove CSS animation
+                        SPA.showToast("Sensori 3D Attivati! Le cards reagiscono all'inclinazione.");
+                    }
+                }).catch(e => {
+                    console.warn("DeviceOrientation ignorata o non supportata.", e);
+                    this.applyFallback();
+                });
+            },
+            handleOrientation(event) {
+                if (!this.active) return;
+
+                let pitch = event.beta;  // -180 to 180 (X-axis)
+                let roll = event.gamma; // -90 to 90 (Y-axis)
+
+                if (pitch === null || roll === null) return;
+
+                if (!this.hasSensors) {
+                    this.hasSensors = true;
+                    this.removeFallback(); // We got valid data
+                }
+
+                // Clamping per evitare rotazioni estreme
+                pitch = Math.max(-20, Math.min(20, pitch - 45));
+                roll = Math.max(-25, Math.min(25, roll));
+
+                // Applica tilt a dashboard cards e moduli (anche ai pallini/icone)
+                const targets = document.querySelectorAll('.module-container, .dash-quad, .header-user-badge');
+                targets.forEach(el => {
+                    el.style.transform = `perspective(1000px) rotateX(${-pitch / 2}deg) rotateY(${roll / 2}deg) translateZ(${Math.abs(roll) / 5}px)`;
+                    el.style.transition = 'transform 0.1s ease-out';
+                });
+            }
+        };
+
         /** INIT on DOMContentLoaded */
         document.addEventListener('DOMContentLoaded', () => {
             CanvasEngine.init();
+            PhysicsEngine.init();
             SPA.init();
 
             // Auto-run diagnostics after a short delay to allow rendering
